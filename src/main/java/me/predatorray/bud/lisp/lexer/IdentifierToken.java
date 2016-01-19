@@ -1,12 +1,14 @@
 package me.predatorray.bud.lisp.lexer;
 
+import me.predatorray.bud.lisp.util.Validation;
+
 public class IdentifierToken implements Token {
 
     private final String name;
     private final TextLocation location;
 
     public IdentifierToken(String name, TextLocation location) {
-        this.name = name;
+        this.name = Validation.notNull(name, "the name of an identifier must not be null");
         this.location = location;
     }
 
