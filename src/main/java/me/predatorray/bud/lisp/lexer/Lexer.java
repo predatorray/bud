@@ -5,17 +5,17 @@ import java.util.NoSuchElementException;
 
 public class Lexer implements Iterable<Token> {
 
-    private final CharSequence lispProgram;
+    private final CharSequence sourceCode;
 
-    public Lexer(CharSequence lispProgram) {
-        if (lispProgram == null) {
+    public Lexer(CharSequence sourceCode) {
+        if (sourceCode == null) {
             throw new NullPointerException();
         }
-        this.lispProgram = lispProgram;
+        this.sourceCode = sourceCode;
     }
 
     public Iterator<Token> iterator() {
-        return new LexerIterator(lispProgram);
+        return new LexerIterator(sourceCode);
     }
 }
 

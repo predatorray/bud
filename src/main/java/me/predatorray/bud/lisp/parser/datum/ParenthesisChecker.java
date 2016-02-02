@@ -1,4 +1,4 @@
-package me.predatorray.bud.lisp.parser;
+package me.predatorray.bud.lisp.parser.datum;
 
 import me.predatorray.bud.lisp.lexer.BooleanToken;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;

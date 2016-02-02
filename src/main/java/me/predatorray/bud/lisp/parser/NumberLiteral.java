@@ -2,7 +2,7 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.lexer.NumberToken;
 
-public class NumberLiteral extends TokenLocatedDatum {
+public class NumberLiteral extends TokenLocatedExpression {
 
     public NumberLiteral(NumberToken numberToken) {
         super(numberToken);
@@ -10,7 +10,7 @@ public class NumberLiteral extends TokenLocatedDatum {
     }
 
     @Override
-    public void accept(DatumVisitor datumVisitor) {
-        datumVisitor.visit(this);
+    public void accept(ExpressionVisitor expressionVisitor) {
+        expressionVisitor.visit(this);
     }
 }

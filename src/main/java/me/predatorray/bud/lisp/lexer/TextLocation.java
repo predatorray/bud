@@ -44,4 +44,9 @@ public class TextLocation {
         result = 31 * result + column;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return line + ":" + column;
+    }
 }

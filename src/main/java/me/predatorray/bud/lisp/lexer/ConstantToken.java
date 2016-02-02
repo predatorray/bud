@@ -6,9 +6,6 @@ abstract class ConstantToken implements Token {
     private final String textForm;
 
     protected ConstantToken(TextLocation location, String textForm) {
-        if (location == null) {
-            throw new NullPointerException();
-        }
         this.location = location;
         this.textForm = textForm;
     }

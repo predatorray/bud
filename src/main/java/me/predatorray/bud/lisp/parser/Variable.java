@@ -3,7 +3,7 @@ package me.predatorray.bud.lisp.parser;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.util.Validation;
 
-public class Variable extends TokenLocatedDatum {
+public class Variable extends TokenLocatedExpression {
 
     private final String variableName;
 
@@ -13,8 +13,8 @@ public class Variable extends TokenLocatedDatum {
     }
 
     @Override
-    public void accept(DatumVisitor datumVisitor) {
-        datumVisitor.visit(this);
+    public void accept(ExpressionVisitor expressionVisitor) {
+        expressionVisitor.visit(this);
     }
 
     public String getVariableName() {

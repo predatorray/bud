@@ -2,9 +2,9 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.lexer.TextLocation;
 
-public interface Datum {
+public interface Expression {
 
     TextLocation getLocation();
 
-    void accept(DatumVisitor datumVisitor);
+    void accept(ExpressionVisitor expressionVisitor);
 }

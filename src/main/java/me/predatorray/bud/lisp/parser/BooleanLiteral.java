@@ -2,7 +2,7 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.lexer.BooleanToken;
 
-public class BooleanLiteral extends TokenLocatedDatum {
+public class BooleanLiteral extends TokenLocatedExpression {
 
     private final boolean value;
 
@@ -12,8 +12,8 @@ public class BooleanLiteral extends TokenLocatedDatum {
     }
 
     @Override
-    public void accept(DatumVisitor datumVisitor) {
-        datumVisitor.visit(this);
+    public void accept(ExpressionVisitor expressionVisitor) {
+        expressionVisitor.visit(this);
     }
 
     public boolean getValue() {

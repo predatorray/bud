@@ -6,7 +6,7 @@ import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.Set;
 
-public class Keyword extends TokenLocatedDatum {
+public class Keyword extends TokenLocatedExpression {
 
     public static final Set<String> EXPRESSION_KEYWORDS = Sets.asSet(
             "quote", "lambda", "if", "set!", "begin", "cond", "and", "or", "case",
@@ -32,8 +32,8 @@ public class Keyword extends TokenLocatedDatum {
     }
 
     @Override
-    public void accept(DatumVisitor datumVisitor) {
-        datumVisitor.visit(this);
+    public void accept(ExpressionVisitor expressionVisitor) {
+        expressionVisitor.visit(this);
     }
 
     public String getKeywordName() {
@@ -49,6 +49,10 @@ public class Keyword extends TokenLocatedDatum {
 
         return keywordName.equals(keyword.keywordName);
 
+    }
+
+    public boolean isQuote() {
+        return "quote".equals(keywordName);
     }
 
     @Override

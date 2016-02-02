@@ -10,8 +10,7 @@ public class Atmosphere extends ConstantToken {
     }
 
     @Override
-    public void accept(TokenVisitor visitor) {
-        visitor.visit(this);
+    public void accept(TokenVisitor ignored) {
     }
 
     @Override
