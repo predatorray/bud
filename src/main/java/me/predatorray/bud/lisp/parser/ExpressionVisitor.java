@@ -18,6 +18,8 @@ public interface ExpressionVisitor {
 
     void visit(LambdaExpression lambdaExpression);
 
+    void visit(Definition definition);
+
     void visit(ListExpression listExpression);
 
     void visit(Expression other);

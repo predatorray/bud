@@ -1,5 +1,7 @@
 package me.predatorray.bud.lisp.util;
 
+import java.util.Collection;
+
 public final class Validation {
 
     public static <T> T notNull(T object) {
@@ -15,5 +17,19 @@ public final class Validation {
         } else {
             throw new NullPointerException();
         }
+    }
+
+    public static <T extends Collection<?>> T notEmpty(T collection) {
+        return notEmpty(collection, null);
+    }
+
+    public static <T extends Collection<?>> T notEmpty(T collection, String message) {
+        if (collection == null) {
+            throw new NullPointerException(message);
+        }
+        if (collection.isEmpty()) {
+            throw new IllegalArgumentException(message);
+        }
+        return collection;
     }
 }

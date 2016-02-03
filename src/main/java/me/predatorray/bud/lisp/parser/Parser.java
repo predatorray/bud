@@ -4,14 +4,21 @@ import me.predatorray.bud.lisp.lexer.Token;
 import me.predatorray.bud.lisp.parser.datum.Datum;
 import me.predatorray.bud.lisp.parser.datum.DatumParserVisitor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Parser {
 
-    public Expression parse(Iterable<? extends Token> tokens) {
+    public List<Expression> parse(Iterable<? extends Token> tokens) {
         DatumParserVisitor visitor = new DatumParserVisitor();
         for (Token token : tokens) {
             token.accept(visitor);
         }
-        Datum rootDatum = visitor.getRootDatum();
-        return rootDatum.getExpression();
+        List<Datum> dataOfProgram = visitor.getRootData();
+        List<Expression> expressions = new ArrayList<Expression>(dataOfProgram.size());
+        for (Datum datum : dataOfProgram) {
+            expressions.add(datum.getExpression());
+        }
+        return expressions;
     }
 }

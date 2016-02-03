@@ -3,6 +3,7 @@ package me.predatorray.bud.lisp.parser;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.lexer.RightParenthesis;
+import me.predatorray.bud.lisp.lexer.StringToken;
 import me.predatorray.bud.lisp.lexer.TextLocation;
 import me.predatorray.bud.lisp.lexer.Token;
 import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
@@ -24,8 +25,10 @@ public class ParserTest {
 
     private void assertMatches(Expression expected, List<? extends Token> input) {
         Parser parser = new Parser();
-        Expression actual = parser.parse(input);
-        Assert.assertEquals(expected, actual);
+        List<Expression> actualExpressions = parser.parse(input);
+        Assert.assertNotNull("only one expression is expected", actualExpressions);
+        Assert.assertEquals("only one expression is expected", 1, actualExpressions.size());
+        Assert.assertEquals(expected, actualExpressions.get(0));
     }
 
     @Test
@@ -52,13 +55,42 @@ public class ParserTest {
     }
 
     @Test
-    public void testParser3() throws Exception {
+    public void testParseQuote1() throws Exception {
         // ( quote a )
         IdentifierToken quote = new IdentifierToken("quote", DUMMY_LOCATION);
         IdentifierToken a = new IdentifierToken("a", DUMMY_LOCATION);
         List<Token> input = Arrays.asList(LP, quote, a, RP);
 
         Expression expected = new QuoteSpecialForm(new SymbolDatum(new IdentifierToken("a", DUMMY_LOCATION)), LP);
+        assertMatches(expected, input);
+    }
+
+    @Test
+    public void testParseLambda1() throws Exception {
+        // (lambda (arg1 arg2) (+ arg1 arg2))
+        IdentifierToken lambda = new IdentifierToken("lambda", DUMMY_LOCATION);
+        IdentifierToken arg1 = new IdentifierToken("arg1", DUMMY_LOCATION);
+        IdentifierToken arg2 = new IdentifierToken("arg2", DUMMY_LOCATION);
+        IdentifierToken plus = new IdentifierToken("+", DUMMY_LOCATION);
+        List<Token> input = Arrays.asList(LP, lambda, LP, arg1, arg2, RP, LP, plus, arg1, arg2, RP, RP);
+
+        Variable var1 = new Variable(arg1);
+        Variable var2 = new Variable(arg2);
+        Expression addTwoArgs = new ProcedureCall(new Variable(plus), Arrays.asList(var1, var2), LP);
+        Expression expected = new LambdaExpression(Arrays.asList(var1, var2),
+                Collections.<Definition>emptyList(), addTwoArgs, LP);
+        assertMatches(expected, input);
+    }
+
+    @Test
+    public void testDefine1() throws Exception {
+        // (define greeting "hello")
+        IdentifierToken define = new IdentifierToken("define", DUMMY_LOCATION);
+        IdentifierToken greeting = new IdentifierToken("greeting", DUMMY_LOCATION);
+        StringToken hello = new StringToken("hello", DUMMY_LOCATION);
+        List<Token> input = Arrays.asList(LP, define, greeting, hello, RP);
+
+        Expression expected = new Definition(new Variable(greeting), new StringLiteral(hello), LP);
         assertMatches(expected, input);
     }
 }

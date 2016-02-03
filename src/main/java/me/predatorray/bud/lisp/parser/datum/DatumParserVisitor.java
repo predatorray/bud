@@ -80,12 +80,10 @@ public class DatumParserVisitor implements TokenVisitor {
         throw new ParserException("unknown token: " + unknown);
     }
 
-    public Datum getRootDatum() {
+    public List<Datum> getRootData() {
         if (!parenthesisChecker.isBalanced()) {
             throw new ParserException("parentheses are not balanced");
         }
-        List<Datum> root = dataStack.peek();
-        return root.get(0); // TODO
+        return dataStack.peek();
     }
-
 }
