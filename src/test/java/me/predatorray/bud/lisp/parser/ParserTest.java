@@ -8,14 +8,12 @@ import me.predatorray.bud.lisp.lexer.TextLocation;
 import me.predatorray.bud.lisp.lexer.Token;
 import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@Ignore
 public class ParserTest {
 
     private static final TextLocation DUMMY_LOCATION = new TextLocation(1, 1);
