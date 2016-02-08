@@ -1,5 +1,5 @@
 language: java
 jdk:
-  - openjdk6
+  - oraclejdk7
 after_success:
   - mvn clean cobertura:cobertura org.eluder.coveralls:coveralls-maven-plugin:report
