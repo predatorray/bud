@@ -38,4 +38,12 @@ public class ProcedureCall extends TokenLocatedExpression {
         result = 31 * result + operands.hashCode();
         return result;
     }
+
+    public Expression getOperator() {
+        return operator;
+    }
+
+    public List<? extends Expression> getOperands() {
+        return operands;
+    }
 }

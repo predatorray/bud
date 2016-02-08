@@ -33,6 +33,11 @@ public class Variable extends TokenLocatedExpression {
     }
 
     @Override
+    public String toString() {
+        return variableName;
+    }
+
+    @Override
     public int hashCode() {
         return variableName.hashCode();
     }

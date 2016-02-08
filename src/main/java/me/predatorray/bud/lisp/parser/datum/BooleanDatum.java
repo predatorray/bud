@@ -37,4 +37,8 @@ public class BooleanDatum implements Datum {
     public int hashCode() {
         return booleanToken.hashCode();
     }
+
+    public boolean getValue() {
+        return booleanToken.getValue();
+    }
 }

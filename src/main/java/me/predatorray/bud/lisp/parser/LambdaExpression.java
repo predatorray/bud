@@ -9,14 +9,14 @@ public class LambdaExpression extends TokenLocatedExpression {
 
     private final List<Variable> formals;
     private final List<Definition> definitions;
-    private final Expression lambdaExpression;
+    private final Expression bodyExpression;
 
-    public LambdaExpression(List<Variable> formals, List<Definition> definitions, Expression lambdaExpression,
+    public LambdaExpression(List<Variable> formals, List<Definition> definitions, Expression bodyExpression,
                             LeftParenthesis leading) {
         super(leading);
         this.formals = Validation.notEmpty(formals, "formals must not be empty");
         this.definitions = Validation.notNull(definitions);
-        this.lambdaExpression = Validation.notNull(lambdaExpression);
+        this.bodyExpression = Validation.notNull(bodyExpression);
     }
 
     @Override
@@ -33,14 +33,26 @@ public class LambdaExpression extends TokenLocatedExpression {
 
         if (!formals.equals(that.formals)) return false;
         if (!definitions.equals(that.definitions)) return false;
-        return lambdaExpression.equals(that.lambdaExpression);
+        return bodyExpression.equals(that.bodyExpression);
     }
 
     @Override
     public int hashCode() {
         int result = formals.hashCode();
         result = 31 * result + definitions.hashCode();
-        result = 31 * result + lambdaExpression.hashCode();
+        result = 31 * result + bodyExpression.hashCode();
         return result;
+    }
+
+    public List<Variable> getFormals() {
+        return formals;
+    }
+
+    public List<Definition> getDefinitions() {
+        return definitions;
+    }
+
+    public Expression getBodyExpression() {
+        return bodyExpression;
     }
 }

@@ -1,10 +1,16 @@
 package me.predatorray.bud.lisp.lexer;
 
+import me.predatorray.bud.lisp.util.Validation;
+
+import java.math.BigDecimal;
+
 public class NumberToken implements Token {
 
+    private final BigDecimal decimal;
     private final TextLocation location;
 
-    public NumberToken(TextLocation location) {
+    public NumberToken(BigDecimal decimal, TextLocation location) {
+        this.decimal = Validation.notNull(decimal);
         this.location = location;
     }
 
@@ -20,6 +26,10 @@ public class NumberToken implements Token {
 
     @Override
     public String toString() {
-        return null; // TODO
+        return decimal.toString();
+    }
+
+    public BigDecimal getValue() {
+        return decimal;
     }
 }

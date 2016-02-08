@@ -4,6 +4,8 @@ import me.predatorray.bud.lisp.lexer.NumberToken;
 import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.NumberLiteral;
 
+import java.math.BigDecimal;
+
 public class NumberDatum implements Datum {
 
     private final NumberToken numberToken;
@@ -35,5 +37,9 @@ public class NumberDatum implements Datum {
     @Override
     public Expression getExpression() {
         return new NumberLiteral(numberToken);
+    }
+
+    public BigDecimal getValue() {
+        return numberToken.getValue();
     }
 }
