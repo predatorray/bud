@@ -42,4 +42,8 @@ public class SymbolDatum implements Datum {
     public int hashCode() {
         return identifierToken.hashCode();
     }
+
+    public String getName() {
+        return identifierToken.getName();
+    }
 }

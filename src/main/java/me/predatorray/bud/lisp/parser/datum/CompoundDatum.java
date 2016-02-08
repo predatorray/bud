@@ -7,7 +7,6 @@ import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.ExpressionVisitor;
 import me.predatorray.bud.lisp.parser.Keyword;
 import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.ListExpression;
 import me.predatorray.bud.lisp.parser.NotApplicableException;
 import me.predatorray.bud.lisp.parser.NumberLiteral;
 import me.predatorray.bud.lisp.parser.ParserException;
@@ -51,7 +50,7 @@ public class CompoundDatum implements Datum {
     @Override
     public Expression getExpression() {
         if (operator == null) {
-            return new ListExpression(Collections.<Expression>emptyList(), leftParenthesis);
+            throw new ParserException("() is not an expression");
         }
 
         Datum first = data.get(0);
@@ -59,6 +58,10 @@ public class CompoundDatum implements Datum {
         CompoundExpressionConstructor constructor = new CompoundExpressionConstructor();
         operatorExpression.accept(constructor);
         return constructor.compoundExpression;
+    }
+
+    public List<Datum> getData() {
+        return data;
     }
 
     @Override
@@ -200,11 +203,6 @@ public class CompoundDatum implements Datum {
         @Override
         public void visit(Definition definition) {
             throw new NotApplicableException(definition);
-        }
-
-        @Override
-        public void visit(ListExpression listExpression) {
-            throw new NotApplicableException(listExpression);
         }
 
         @Override

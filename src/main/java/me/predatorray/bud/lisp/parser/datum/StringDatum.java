@@ -37,4 +37,8 @@ public class StringDatum implements Datum {
     public Expression getExpression() {
         return new StringLiteral(stringToken);
     }
+
+    public String getValue() {
+        return stringToken.getStringValue();
+    }
 }

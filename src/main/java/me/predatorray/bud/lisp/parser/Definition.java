@@ -36,4 +36,12 @@ public class Definition extends TokenLocatedExpression {
         result = 31 * result + expression.hashCode();
         return result;
     }
+
+    public Variable getVariable() {
+        return variable;
+    }
+
+    public Expression getExpression() {
+        return expression;
+    }
 }
