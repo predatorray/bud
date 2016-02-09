@@ -21,7 +21,7 @@ public class DatumParserVisitor implements TokenVisitor {
     private final Stack<List<Datum>> dataStack;
 
     public DatumParserVisitor() {
-        dataStack = new Stack<List<Datum>>();
+        dataStack = new Stack<>();
         dataStack.push(new LinkedList<Datum>());
     }
 

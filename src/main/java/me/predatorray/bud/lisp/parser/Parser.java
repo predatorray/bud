@@ -15,7 +15,7 @@ public class Parser {
             token.accept(visitor);
         }
         List<Datum> dataOfProgram = visitor.getRootData();
-        List<Expression> expressions = new ArrayList<Expression>(dataOfProgram.size());
+        List<Expression> expressions = new ArrayList<>(dataOfProgram.size());
         for (Datum datum : dataOfProgram) {
             expressions.add(datum.getExpression());
         }

@@ -53,7 +53,7 @@ public class Environment implements BudObject {
     }
 
     private static Map<String, BudObject> toStringMap(Map<Variable, BudObject> bindings) {
-        Map<String, BudObject> stringMap = new HashMap<String, BudObject>(bindings.size());
+        Map<String, BudObject> stringMap = new HashMap<>(bindings.size());
         for (Map.Entry<Variable, BudObject> entry : bindings.entrySet()) {
             stringMap.put(entry.getKey().getVariableName(), entry.getValue());
         }

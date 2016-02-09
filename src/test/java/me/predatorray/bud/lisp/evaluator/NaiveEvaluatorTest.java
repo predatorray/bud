@@ -7,11 +7,7 @@ import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudString;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.test.AbstractBudLispTest;
 import org.junit.Test;
 
@@ -98,5 +94,38 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(application, initial);
         BudObject expected = BudBoolean.valueOf(false);
         assertEquals(expected, evaluated);
+    }
+
+    @Test
+    public void testEvaluateIf1() throws Exception {
+        // (if #t "1" "2") ==> "1"
+        String first = "1";
+        String second = "2";
+        Expression ifSpecialForm = new IfSpecialForm(
+                newBooleanLiteral(true), newStringLiteral(first), newStringLiteral(second), LP);
+        BudObject evaluated = sut.evaluate(ifSpecialForm, EMPTY_ENV);
+        assertEquals("(if #t \"1\" \"2\") ==> \"1\"", new BudString(first), evaluated);
+    }
+
+    @Test
+    public void testEvaluateIf2() throws Exception {
+        // (if #f "1" "2") ==> "2"
+        String first = "1";
+        String second = "2";
+        Expression ifSpecialForm = new IfSpecialForm(
+                newBooleanLiteral(false), newStringLiteral(first), newStringLiteral(second), LP);
+        BudObject evaluated = sut.evaluate(ifSpecialForm, EMPTY_ENV);
+        assertEquals("(if #f \"1\" \"2\") ==> \"2\"", new BudString(second), evaluated);
+    }
+
+    @Test
+    public void testEvaluateIf3() throws Exception {
+        // (if '() "1" "2")
+        String first = "1";
+        String second = "2";
+        Expression ifSpecialForm = new IfSpecialForm(
+                newQuoteSpecialForm(newCompoundDatum()), newStringLiteral(first), newStringLiteral(second), LP);
+        BudObject evaluated = sut.evaluate(ifSpecialForm, EMPTY_ENV);
+        assertEquals("(if '() \"1\" \"2\")", new BudString(first), evaluated);
     }
 }

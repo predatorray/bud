@@ -1,19 +1,7 @@
 package me.predatorray.bud.lisp.parser.datum;
 
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
-import me.predatorray.bud.lisp.parser.BooleanLiteral;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.ExpressionVisitor;
-import me.predatorray.bud.lisp.parser.Keyword;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.NotApplicableException;
-import me.predatorray.bud.lisp.parser.NumberLiteral;
-import me.predatorray.bud.lisp.parser.ParserException;
-import me.predatorray.bud.lisp.parser.ProcedureCall;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.StringLiteral;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.util.StringUtils;
 
 import java.util.ArrayList;
@@ -146,7 +134,7 @@ public class CompoundDatum implements Datum {
                 }
 
                 Datum formalsDatum = operands.get(0);
-                List<Variable> formals = new LinkedList<Variable>();
+                List<Variable> formals = new LinkedList<>();
                 if (formalsDatum instanceof SymbolDatum) {
                     Variable variable = asFormalVariable(formalsDatum);
                     formals.add(variable);
@@ -167,6 +155,19 @@ public class CompoundDatum implements Datum {
 
                 Expression bodyExpression = operands.get(operandSize - 1).getExpression();
                 compoundExpression = new LambdaExpression(formals, definitions, bodyExpression, leftParenthesis);
+            }
+
+            // (if <test> <consequent> <alternate>)
+            else if ("if".equals(keyword.getKeywordName())) {
+                if (operandSize != 3) {
+                    throw new ParserException("malformed if expression " + data);
+                }
+
+                Datum test = operands.get(0);
+                Datum consequent = operands.get(1);
+                Datum alternate = operands.get(2);
+                compoundExpression = new IfSpecialForm(test.getExpression(), consequent.getExpression(),
+                        alternate.getExpression(), leftParenthesis);
             }
 
             else {
@@ -196,6 +197,11 @@ public class CompoundDatum implements Datum {
         }
 
         @Override
+        public void visit(IfSpecialForm ifSpecialForm) {
+            constructProcedureCall(ifSpecialForm);
+        }
+
+        @Override
         public void visit(LambdaExpression lambdaExpression) {
             constructProcedureCall(lambdaExpression);
         }
@@ -212,7 +218,7 @@ public class CompoundDatum implements Datum {
 
         private void constructProcedureCall(Expression operator) {
             assert operands != null;
-            List<Expression> operandExpressions = new ArrayList<Expression>(operands.size());
+            List<Expression> operandExpressions = new ArrayList<>(operands.size());
             for (Datum operand : operands) {
                 operandExpressions.add(operand.getExpression());
             }

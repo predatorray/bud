@@ -10,17 +10,7 @@ import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Function;
 import me.predatorray.bud.lisp.lang.LambdaFunction;
 import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.BooleanLiteral;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.ExpressionVisitor;
-import me.predatorray.bud.lisp.parser.Keyword;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.NumberLiteral;
-import me.predatorray.bud.lisp.parser.ProcedureCall;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.StringLiteral;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.parser.datum.BooleanDatum;
 import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
 import me.predatorray.bud.lisp.parser.datum.Datum;
@@ -92,7 +82,7 @@ public class NaiveEvaluator implements Evaluator {
 //            function.inspect()
 
             List<? extends Expression> operands = procedureCall.getOperands();
-            List<BudObject> arguments = new ArrayList<BudObject>(operands.size());
+            List<BudObject> arguments = new ArrayList<>(operands.size());
             for (Expression operand : operands) {
                 BudObject arg = evaluate(operand, environment);
                 arguments.add(arg);
@@ -106,6 +96,17 @@ public class NaiveEvaluator implements Evaluator {
             DatumObjectConstructor constructor = new DatumObjectConstructor();
             quotedDatum.accept(constructor);
             evaluated = constructor.datumObject;
+        }
+
+        @Override
+        public void visit(IfSpecialForm ifSpecialForm) {
+            Expression test = ifSpecialForm.getTest();
+            BudObject tested = evaluate(test, environment);
+            if (!BudBoolean.FALSE.equals(tested)) { // any object not #f is treated as true
+                evaluated = evaluate(ifSpecialForm.getConsequent(), environment);
+            } else {
+                evaluated = evaluate(ifSpecialForm.getAlternate(), environment);
+            }
         }
 
         @Override
@@ -151,7 +152,7 @@ public class NaiveEvaluator implements Evaluator {
         @Override
         public void visit(CompoundDatum compoundDatum) {
             List<Datum> data = compoundDatum.getData();
-            List<BudObject> objects = new ArrayList<BudObject>(data.size());
+            List<BudObject> objects = new ArrayList<>(data.size());
             for (Datum datum : data) {
                 DatumObjectConstructor constructor = new DatumObjectConstructor();
                 datum.accept(constructor);
