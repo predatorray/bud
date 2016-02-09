@@ -16,6 +16,8 @@ public interface ExpressionVisitor {
 
     void visit(QuoteSpecialForm quoteSpecialForm);
 
+    void visit(IfSpecialForm ifSpecialForm);
+
     void visit(LambdaExpression lambdaExpression);
 
     void visit(Definition definition);
