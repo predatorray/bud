@@ -59,4 +59,9 @@ public class Keyword extends TokenLocatedExpression {
     public int hashCode() {
         return keywordName.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return keywordName;
+    }
 }

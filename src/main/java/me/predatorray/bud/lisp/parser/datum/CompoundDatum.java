@@ -1,7 +1,22 @@
 package me.predatorray.bud.lisp.parser.datum;
 
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
-import me.predatorray.bud.lisp.parser.*;
+import me.predatorray.bud.lisp.parser.AndSpecialForm;
+import me.predatorray.bud.lisp.parser.BooleanLiteral;
+import me.predatorray.bud.lisp.parser.Definition;
+import me.predatorray.bud.lisp.parser.Expression;
+import me.predatorray.bud.lisp.parser.ExpressionVisitor;
+import me.predatorray.bud.lisp.parser.IfSpecialForm;
+import me.predatorray.bud.lisp.parser.Keyword;
+import me.predatorray.bud.lisp.parser.LambdaExpression;
+import me.predatorray.bud.lisp.parser.NotApplicableException;
+import me.predatorray.bud.lisp.parser.NumberLiteral;
+import me.predatorray.bud.lisp.parser.OrSpecialForm;
+import me.predatorray.bud.lisp.parser.ParserException;
+import me.predatorray.bud.lisp.parser.ProcedureCall;
+import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
+import me.predatorray.bud.lisp.parser.StringLiteral;
+import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.util.StringUtils;
 
 import java.util.ArrayList;
@@ -170,6 +185,24 @@ public class CompoundDatum implements Datum {
                         alternate.getExpression(), leftParenthesis);
             }
 
+            // (and <test>*)
+            else if ("and".equals(keyword.getKeywordName())) {
+                List<Expression> tests = new ArrayList<>(operandSize);
+                for (Datum operand : operands) {
+                    tests.add(operand.getExpression());
+                }
+                compoundExpression = new AndSpecialForm(tests, leftParenthesis);
+            }
+
+            // (or <test>*)
+            else if ("or".equals(keyword.getKeywordName())) {
+                List<Expression> tests = new ArrayList<>(operandSize);
+                for (Datum operand : operands) {
+                    tests.add(operand.getExpression());
+                }
+                compoundExpression = new OrSpecialForm(tests, leftParenthesis);
+            }
+
             else {
                 throw new ParserException("not an expression " + data);
             }
@@ -199,6 +232,16 @@ public class CompoundDatum implements Datum {
         @Override
         public void visit(IfSpecialForm ifSpecialForm) {
             constructProcedureCall(ifSpecialForm);
+        }
+
+        @Override
+        public void visit(AndSpecialForm andSpecialForm) {
+            constructProcedureCall(andSpecialForm);
+        }
+
+        @Override
+        public void visit(OrSpecialForm orSpecialForm) {
+            constructProcedureCall(orSpecialForm);
         }
 
         @Override

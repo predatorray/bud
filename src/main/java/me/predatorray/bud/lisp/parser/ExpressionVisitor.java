@@ -18,6 +18,10 @@ public interface ExpressionVisitor {
 
     void visit(IfSpecialForm ifSpecialForm);
 
+    void visit(AndSpecialForm andSpecialForm);
+
+    void visit(OrSpecialForm orSpecialForm);
+
     void visit(LambdaExpression lambdaExpression);
 
     void visit(Definition definition);

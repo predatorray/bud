@@ -7,7 +7,14 @@ import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudString;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.*;
+import me.predatorray.bud.lisp.parser.AndSpecialForm;
+import me.predatorray.bud.lisp.parser.Definition;
+import me.predatorray.bud.lisp.parser.Expression;
+import me.predatorray.bud.lisp.parser.IfSpecialForm;
+import me.predatorray.bud.lisp.parser.LambdaExpression;
+import me.predatorray.bud.lisp.parser.OrSpecialForm;
+import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
+import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.test.AbstractBudLispTest;
 import org.junit.Test;
 
@@ -15,6 +22,10 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 public class NaiveEvaluatorTest extends AbstractBudLispTest {
 
@@ -127,5 +138,83 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
                 newQuoteSpecialForm(newCompoundDatum()), newStringLiteral(first), newStringLiteral(second), LP);
         BudObject evaluated = sut.evaluate(ifSpecialForm, EMPTY_ENV);
         assertEquals("(if '() \"1\" \"2\")", new BudString(first), evaluated);
+    }
+
+    @Test
+    public void testEvaluateAnd1() throws Exception {
+        // (and #f #t) ==> #f
+        NaiveEvaluator spied = spy(new NaiveEvaluator());
+        Expression falseExpression = newBooleanLiteral(false);
+        Expression trueExpression = newBooleanLiteral(true);
+        Expression andSpecialForm = new AndSpecialForm(Arrays.asList(falseExpression, trueExpression), LP);
+
+        BudObject evaluated = spied.evaluate(andSpecialForm, EMPTY_ENV);
+
+        assertEquals("(and #f #t) ==> #f", BudBoolean.FALSE, evaluated);
+        verify(spied).evaluate(same(falseExpression), same(EMPTY_ENV));
+        verify(spied, never()).evaluate(same(trueExpression), same(EMPTY_ENV));
+    }
+
+    @Test
+    public void testEvaluateAnd2() throws Exception {
+        // (and '() "false") ==> "false"
+        NaiveEvaluator spied = spy(new NaiveEvaluator());
+        Expression[] tests = new Expression[] {
+                newQuoteSpecialForm(newCompoundDatum()),
+                newStringLiteral("false")
+        };
+        Expression andSpecialForm = new AndSpecialForm(Arrays.asList(tests), LP);
+
+        BudObject evaluated = spied.evaluate(andSpecialForm, EMPTY_ENV);
+
+        assertEquals("(and '() \"false\") ==> \"false\"", new BudString("false"), evaluated);
+        verify(spied).evaluate(same(tests[0]), same(EMPTY_ENV));
+        verify(spied).evaluate(same(tests[1]), same(EMPTY_ENV));
+    }
+
+    @Test
+    public void testEvaluateAnd3() throws Exception {
+        // (and) ==> #t
+        Expression andSpecialForm = new AndSpecialForm(Collections.<Expression>emptyList(), LP);
+        BudObject evaluated = sut.evaluate(andSpecialForm, EMPTY_ENV);
+        assertEquals("(and) ==> #t", BudBoolean.TRUE, evaluated);
+    }
+
+    @Test
+    public void testEvaluateOr1() throws Exception {
+        // (or #t #f) ==> #t
+        NaiveEvaluator spied = spy(new NaiveEvaluator());
+        Expression trueExpression = newBooleanLiteral(true);
+        Expression falseExpression = newBooleanLiteral(false);
+        Expression orSpecialForm = new OrSpecialForm(Arrays.asList(trueExpression, falseExpression), LP);
+
+        BudObject evaluated = spied.evaluate(orSpecialForm, EMPTY_ENV);
+
+        assertEquals("(or #t #f) ==> #t", BudBoolean.TRUE, evaluated);
+        verify(spied).evaluate(same(trueExpression), same(EMPTY_ENV));
+        verify(spied, never()).evaluate(same(falseExpression), same(EMPTY_ENV));
+    }
+
+    @Test
+    public void testEvaluateOr2() throws Exception {
+        // (or '() #f) ==> #t
+        NaiveEvaluator spied = spy(new NaiveEvaluator());
+        Expression trueExpression = newBooleanLiteral(true);
+        Expression falseExpression = newBooleanLiteral(false);
+        Expression orSpecialForm = new OrSpecialForm(Arrays.asList(trueExpression, falseExpression), LP);
+
+        BudObject evaluated = spied.evaluate(orSpecialForm, EMPTY_ENV);
+
+        assertEquals("(or '() #f) ==> #t", BudBoolean.TRUE, evaluated);
+        verify(spied).evaluate(same(trueExpression), same(EMPTY_ENV));
+        verify(spied, never()).evaluate(same(falseExpression), same(EMPTY_ENV));
+    }
+
+    @Test
+    public void testEvaluateOr3() throws Exception {
+        // (or) ==> #f
+        Expression orSpecialForm = new OrSpecialForm(Collections.<Expression>emptyList(), LP);
+        BudObject evaluated = sut.evaluate(orSpecialForm, EMPTY_ENV);
+        assertEquals("(or) ==> #f", BudBoolean.FALSE, evaluated);
     }
 }

@@ -10,7 +10,20 @@ import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Function;
 import me.predatorray.bud.lisp.lang.LambdaFunction;
 import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.*;
+import me.predatorray.bud.lisp.parser.AndSpecialForm;
+import me.predatorray.bud.lisp.parser.BooleanLiteral;
+import me.predatorray.bud.lisp.parser.Definition;
+import me.predatorray.bud.lisp.parser.Expression;
+import me.predatorray.bud.lisp.parser.ExpressionVisitor;
+import me.predatorray.bud.lisp.parser.IfSpecialForm;
+import me.predatorray.bud.lisp.parser.Keyword;
+import me.predatorray.bud.lisp.parser.LambdaExpression;
+import me.predatorray.bud.lisp.parser.NumberLiteral;
+import me.predatorray.bud.lisp.parser.OrSpecialForm;
+import me.predatorray.bud.lisp.parser.ProcedureCall;
+import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
+import me.predatorray.bud.lisp.parser.StringLiteral;
+import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.parser.datum.BooleanDatum;
 import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
 import me.predatorray.bud.lisp.parser.datum.Datum;
@@ -68,7 +81,7 @@ public class NaiveEvaluator implements Evaluator {
 
         @Override
         public void visit(Keyword keyword) {
-            // TODO not possible
+            throw new EvaluatingException("cannot evaluate a keyword " + keyword);
         }
 
         @Override
@@ -79,14 +92,17 @@ public class NaiveEvaluator implements Evaluator {
                 throw new EvaluatingException("not applicable", operator);
             }
             Function function = (Function) applicable;
-//            function.inspect()
 
             List<? extends Expression> operands = procedureCall.getOperands();
+
+            List<BudType> argTypes = new ArrayList<>(operands.size());
             List<BudObject> arguments = new ArrayList<>(operands.size());
             for (Expression operand : operands) {
                 BudObject arg = evaluate(operand, environment);
+                argTypes.add(arg.getType());
                 arguments.add(arg);
             }
+            function.inspect(argTypes);
             evaluated = function.apply(arguments);
         }
 
@@ -107,6 +123,34 @@ public class NaiveEvaluator implements Evaluator {
             } else {
                 evaluated = evaluate(ifSpecialForm.getAlternate(), environment);
             }
+        }
+
+        @Override
+        public void visit(AndSpecialForm andSpecialForm) {
+            List<Expression> tests = andSpecialForm.getTests();
+            BudObject eachTested = BudBoolean.TRUE;
+            for (Expression test : tests) {
+                eachTested = evaluate(test, environment);
+                if (BudBoolean.FALSE.equals(eachTested)) {
+                    evaluated = eachTested;
+                    return;
+                }
+            }
+            evaluated = eachTested;
+        }
+
+        @Override
+        public void visit(OrSpecialForm orSpecialForm) {
+            List<Expression> tests = orSpecialForm.getTests();
+            BudObject eachTested = BudBoolean.FALSE;
+            for (Expression test : tests) {
+                eachTested = evaluate(test, environment);
+                if (!BudBoolean.FALSE.equals(eachTested)) {
+                    evaluated = eachTested;
+                    return;
+                }
+            }
+            evaluated = eachTested;
         }
 
         @Override
