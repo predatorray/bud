@@ -1,4 +1,4 @@
-package me.predatorray.bud.lisp.lexer;
+package me.predatorray.bud.lisp.util;
 
 public final class StringEscapeUtils {
 

@@ -3,14 +3,14 @@ package me.predatorray.bud.lisp.parser;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
-public class IfSpecialForm extends TokenLocatedExpression {
+public class IfSpecialForm extends CompoundExpression {
 
     private final Expression test;
     private final Expression consequent;
     private final Expression alternate;
 
     public IfSpecialForm(Expression test, Expression consequent, Expression alternate, LeftParenthesis leading) {
-        super(leading);
+        super(leading, "if", test, consequent, alternate);
         this.test = Validation.notNull(test);
         this.consequent = Validation.notNull(consequent);
         this.alternate = Validation.notNull(alternate);

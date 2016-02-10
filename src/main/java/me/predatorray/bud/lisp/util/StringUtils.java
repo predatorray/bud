@@ -17,4 +17,11 @@ public class StringUtils {
         }
         return joined.toString();
     }
+
+    public static String quote(String str) {
+        if (str == null) {
+            return "null";
+        }
+        return "\"" + StringEscapeUtils.escape(str) + "\"";
+    }
 }

@@ -5,12 +5,12 @@ import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.List;
 
-public class AndSpecialForm extends TokenLocatedExpression {
+public class AndSpecialForm extends CompoundExpression {
 
     private final List<Expression> tests;
 
     public AndSpecialForm(List<Expression> tests, LeftParenthesis leading) {
-        super(leading);
+        super(leading, "and", tests);
         this.tests = Validation.notNull(tests);
     }
 
@@ -36,5 +36,10 @@ public class AndSpecialForm extends TokenLocatedExpression {
     @Override
     public int hashCode() {
         return tests.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "";
     }
 }

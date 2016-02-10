@@ -5,12 +5,12 @@ import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.List;
 
-public class OrSpecialForm extends TokenLocatedExpression {
+public class OrSpecialForm extends CompoundExpression {
 
     private final List<Expression> tests;
 
     public OrSpecialForm(List<Expression> tests, LeftParenthesis leading) {
-        super(leading);
+        super(leading, "or", tests);
         this.tests = Validation.notNull(tests);
     }
 

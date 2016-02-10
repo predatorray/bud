@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.buitin;
 
 import me.predatorray.bud.lisp.buitin.arithmetic.AddFunction;
+import me.predatorray.bud.lisp.buitin.arithmetic.SubtractFunction;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
 
@@ -11,7 +12,7 @@ public class BuiltinsEnvironment {
 
     public static final Environment INSTANCE;
     static {
-        Map<String, BudObject> initial = new HashMap<String, BudObject>();
+        Map<String, BudObject> initial = new HashMap<>();
 
         initial.put("eq?", new EqualPredicate());
         initial.put("equals?", new EqualPredicate());
@@ -23,6 +24,7 @@ public class BuiltinsEnvironment {
         initial.put("null?", new NullPredicate());
 
         initial.put("+", new AddFunction());
+        initial.put("-", new SubtractFunction());
 
         initial.put("null-environment", new NullEnvironmentFunction());
         initial.put("builtins-environment", new BuiltinsEnvironmentFunction());

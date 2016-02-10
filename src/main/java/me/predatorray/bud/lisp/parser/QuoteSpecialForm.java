@@ -36,4 +36,9 @@ public class QuoteSpecialForm extends TokenLocatedExpression {
     public int hashCode() {
         return quotedDatum.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "(quote " + quotedDatum + ")";
+    }
 }

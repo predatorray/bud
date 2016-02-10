@@ -34,6 +34,11 @@ public class StringDatum implements Datum {
     }
 
     @Override
+    public String toString() {
+        return stringToken.toString();
+    }
+
+    @Override
     public Expression getExpression() {
         return new StringLiteral(stringToken);
     }

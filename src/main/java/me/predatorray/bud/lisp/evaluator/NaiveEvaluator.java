@@ -10,20 +10,7 @@ import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Function;
 import me.predatorray.bud.lisp.lang.LambdaFunction;
 import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.AndSpecialForm;
-import me.predatorray.bud.lisp.parser.BooleanLiteral;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.ExpressionVisitor;
-import me.predatorray.bud.lisp.parser.IfSpecialForm;
-import me.predatorray.bud.lisp.parser.Keyword;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.NumberLiteral;
-import me.predatorray.bud.lisp.parser.OrSpecialForm;
-import me.predatorray.bud.lisp.parser.ProcedureCall;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.StringLiteral;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.parser.datum.BooleanDatum;
 import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
 import me.predatorray.bud.lisp.parser.datum.Datum;
@@ -34,6 +21,7 @@ import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NaiveEvaluator implements Evaluator {
@@ -154,18 +142,48 @@ public class NaiveEvaluator implements Evaluator {
         }
 
         @Override
+        public void visit(ConditionSpecialForm conditionSpecialForm) {
+            List<ConditionClause> clauses = conditionSpecialForm.getClauses();
+            for (ConditionClause clause : clauses) {
+                Expression test = clause.getTest();
+                BudObject tested = evaluate(test, environment);
+                if (BudBoolean.FALSE.equals(tested)) {
+                    continue;
+                }
+
+                if (clause.hasRecipient()) {
+                    Expression recipient = clause.getRecipient();
+                    BudObject recipientObj = evaluate(recipient, environment);
+                    if (!BudType.Category.FUNCTION.equals(recipientObj.getType().getCategory())) {
+                        throw new NotApplicableException(recipient);
+                    }
+                    Function recipientFunction = (Function) recipientObj;
+                    recipientFunction.inspect(Collections.singletonList(tested.getType()));
+                    evaluated = recipientFunction.apply(Collections.singletonList(tested));
+                } else {
+                    Expression consequent = clause.getConsequent();
+                    evaluated = evaluate(consequent, environment);
+                }
+                return;
+            }
+            Expression elseExpression = conditionSpecialForm.getElseExpression();
+            if (elseExpression == null) {
+                throw new EvaluatingException("all clauses in cond are evaluated to false values and " +
+                        "no else-clause is found",
+                        conditionSpecialForm);
+            } else {
+                evaluated = evaluate(elseExpression, environment);
+            }
+        }
+
+        @Override
         public void visit(LambdaExpression lambdaExpression) {
             evaluated = new LambdaFunction(lambdaExpression, environment, NaiveEvaluator.this);
         }
 
         @Override
-        public void visit(Definition definition) {
-            // TODO return new Environment
-        }
-
-        @Override
         public void visit(Expression other) {
-            // TODO unknown
+            throw new EvaluatingException("unknown expression", other);
         }
     }
 

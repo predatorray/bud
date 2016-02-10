@@ -48,11 +48,10 @@ public class Keyword extends TokenLocatedExpression {
         Keyword keyword = (Keyword) o;
 
         return keywordName.equals(keyword.keywordName);
-
     }
 
-    public boolean isQuote() {
-        return "quote".equals(keywordName);
+    public boolean isExpressionKeyword() {
+        return EXPRESSION_KEYWORDS.contains(keywordName);
     }
 
     @Override

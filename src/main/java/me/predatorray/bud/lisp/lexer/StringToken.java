@@ -1,5 +1,7 @@
 package me.predatorray.bud.lisp.lexer;
 
+import me.predatorray.bud.lisp.util.StringEscapeUtils;
+
 public class StringToken implements Token {
 
     private final String stringValue;

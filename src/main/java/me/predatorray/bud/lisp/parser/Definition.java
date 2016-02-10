@@ -1,22 +1,15 @@
 package me.predatorray.bud.lisp.parser;
 
-import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
-public class Definition extends TokenLocatedExpression {
+public class Definition {
 
     private final Variable variable;
     private final Expression expression;
 
-    public Definition(Variable variable, Expression expression, LeftParenthesis leading) {
-        super(leading);
+    public Definition(Variable variable, Expression expression) {
         this.variable = Validation.notNull(variable);
         this.expression = Validation.notNull(expression);
-    }
-
-    @Override
-    public void accept(ExpressionVisitor expressionVisitor) {
-        expressionVisitor.visit(this);
     }
 
     @Override

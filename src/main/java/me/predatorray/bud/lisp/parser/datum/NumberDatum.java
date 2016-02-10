@@ -42,4 +42,9 @@ public class NumberDatum implements Datum {
     public BigDecimal getValue() {
         return numberToken.getValue();
     }
+
+    @Override
+    public String toString() {
+        return numberToken.toString();
+    }
 }

@@ -23,4 +23,9 @@ public class BooleanToken implements Token {
     public boolean getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return value ? "#t" : "#f";
+    }
 }

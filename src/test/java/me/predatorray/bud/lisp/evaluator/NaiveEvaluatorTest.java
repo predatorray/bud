@@ -1,23 +1,13 @@
 package me.predatorray.bud.lisp.evaluator;
 
+import me.predatorray.bud.lisp.buitin.BuiltinsEnvironment;
 import me.predatorray.bud.lisp.buitin.EqualPredicate;
-import me.predatorray.bud.lisp.lang.BudBoolean;
-import me.predatorray.bud.lisp.lang.BudList;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.BudString;
-import me.predatorray.bud.lisp.lang.Environment;
-import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.AndSpecialForm;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.IfSpecialForm;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.OrSpecialForm;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.lang.*;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.test.AbstractBudLispTest;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -216,5 +206,78 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         Expression orSpecialForm = new OrSpecialForm(Collections.<Expression>emptyList(), LP);
         BudObject evaluated = sut.evaluate(orSpecialForm, EMPTY_ENV);
         assertEquals("(or) ==> #f", BudBoolean.FALSE, evaluated);
+    }
+
+    @Test
+    public void testEvaluateCond1() throws Exception {
+        // (cond (#t "1") (#f "2")) ==> "1"
+        NaiveEvaluator spied = spy(new NaiveEvaluator());
+        Expression[] tests = new Expression[] {
+                newBooleanLiteral(true),
+                newBooleanLiteral(false)
+        };
+        ConditionClause[] conditionClauses = new ConditionClause[] {
+                ConditionClause.newConditionClauseOfConsequentExpression(tests[0], newStringLiteral("1")),
+                ConditionClause.newConditionClauseOfConsequentExpression(tests[1], newStringLiteral("2"))
+        };
+        Expression condSpecialForm = new ConditionSpecialForm(Arrays.asList(conditionClauses), null, LP);
+
+        BudObject evaluated = spied.evaluate(condSpecialForm, EMPTY_ENV);
+
+        assertEquals("(cond (#t \"1\") (#f \"2\")) ==> \"1\"", new BudString("1"), evaluated);
+        verify(spied).evaluate(same(tests[0]), same(EMPTY_ENV));
+        verify(spied, never()).evaluate(same(tests[1]), same(EMPTY_ENV));
+    }
+
+    @Test(expected = EvaluatingException.class)
+    public void testEvaluateCond2() throws Exception {
+        // (cond (#f "1") (#f "2")) ==> error
+        Expression[] tests = new Expression[] {
+                newBooleanLiteral(false),
+                newBooleanLiteral(false)
+        };
+        ConditionClause[] conditionClauses = new ConditionClause[] {
+                ConditionClause.newConditionClauseOfConsequentExpression(tests[0], newStringLiteral("1")),
+                ConditionClause.newConditionClauseOfConsequentExpression(tests[1], newStringLiteral("2"))
+        };
+        Expression condSpecialForm = new ConditionSpecialForm(Arrays.asList(conditionClauses), null, LP);
+
+        sut.evaluate(condSpecialForm, EMPTY_ENV);
+    }
+
+    @Test
+    public void testEvaluateCond3() throws Exception {
+        // (cond (#f "1") (#f "2") (else "3")) ==> "3"
+        NaiveEvaluator spied = spy(new NaiveEvaluator());
+        Expression[] tests = new Expression[] {
+                newBooleanLiteral(false),
+                newBooleanLiteral(false)
+        };
+        ConditionClause[] conditionClauses = new ConditionClause[] {
+                ConditionClause.newConditionClauseOfConsequentExpression(tests[0], newStringLiteral("1")),
+                ConditionClause.newConditionClauseOfConsequentExpression(tests[1], newStringLiteral("2")),
+        };
+        Expression elseExpression = newStringLiteral("3");
+        Expression condSpecialForm = new ConditionSpecialForm(Arrays.asList(conditionClauses), elseExpression, LP);
+
+        BudObject evaluated = spied.evaluate(condSpecialForm, EMPTY_ENV);
+
+        assertEquals("(cond (#f \"1\") (#f \"2\") (else \"3\")) ==> \"3\"", new BudString("3"), evaluated);
+        verify(spied).evaluate(same(tests[0]), same(EMPTY_ENV));
+        verify(spied).evaluate(same(tests[1]), same(EMPTY_ENV));
+    }
+
+    @Test
+    public void testEvaluateCond4() throws Exception {
+        // (cond (1 => -)) ==> -1
+        Expression test = newNumberLiteral(1);
+        Expression recipient = newVariable("-");
+        Expression condSpecialForm = new ConditionSpecialForm(
+                Collections.singletonList(ConditionClause.newConditionClauseOfRecipientExpression(test, recipient)),
+                null, LP);
+
+        BudObject evaluated = sut.evaluate(condSpecialForm, BuiltinsEnvironment.INSTANCE);
+
+        assertEquals("(cond (1 => -)) ==> -1", new BudNumber(new BigDecimal(-1)), evaluated);
     }
 }

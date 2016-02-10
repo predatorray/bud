@@ -22,9 +22,9 @@ public interface ExpressionVisitor {
 
     void visit(OrSpecialForm orSpecialForm);
 
-    void visit(LambdaExpression lambdaExpression);
+    void visit(ConditionSpecialForm conditionSpecialForm);
 
-    void visit(Definition definition);
+    void visit(LambdaExpression lambdaExpression);
 
     void visit(Expression other);
 }
