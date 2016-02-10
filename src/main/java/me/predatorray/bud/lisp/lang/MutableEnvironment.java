@@ -9,7 +9,7 @@ import java.util.Map;
 public class MutableEnvironment {
 
     private final Environment enclosed;
-    private Map<String, BudObject> bindings = new HashMap<String, BudObject>();
+    private Map<String, BudObject> bindings = new HashMap<>();
 
     public MutableEnvironment(Environment enclosed) {
         this.enclosed = enclosed;

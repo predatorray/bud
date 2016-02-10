@@ -3,7 +3,6 @@ package me.predatorray.bud.lisp.parser;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.lexer.RightParenthesis;
-import me.predatorray.bud.lisp.lexer.StringToken;
 import me.predatorray.bud.lisp.lexer.TextLocation;
 import me.predatorray.bud.lisp.lexer.Token;
 import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
@@ -77,18 +76,6 @@ public class ParserTest {
         Expression addTwoArgs = new ProcedureCall(new Variable(plus), Arrays.asList(var1, var2), LP);
         Expression expected = new LambdaExpression(Arrays.asList(var1, var2),
                 Collections.<Definition>emptyList(), addTwoArgs, LP);
-        assertMatches(expected, input);
-    }
-
-    @Test
-    public void testDefine1() throws Exception {
-        // (define greeting "hello")
-        IdentifierToken define = new IdentifierToken("define", DUMMY_LOCATION);
-        IdentifierToken greeting = new IdentifierToken("greeting", DUMMY_LOCATION);
-        StringToken hello = new StringToken("hello", DUMMY_LOCATION);
-        List<Token> input = Arrays.asList(LP, define, greeting, hello, RP);
-
-        Expression expected = new Definition(new Variable(greeting), new StringLiteral(hello), LP);
         assertMatches(expected, input);
     }
 }

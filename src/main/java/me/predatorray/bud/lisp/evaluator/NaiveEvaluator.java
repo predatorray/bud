@@ -10,17 +10,7 @@ import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Function;
 import me.predatorray.bud.lisp.lang.LambdaFunction;
 import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.BooleanLiteral;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.ExpressionVisitor;
-import me.predatorray.bud.lisp.parser.Keyword;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.NumberLiteral;
-import me.predatorray.bud.lisp.parser.ProcedureCall;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.StringLiteral;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.parser.datum.BooleanDatum;
 import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
 import me.predatorray.bud.lisp.parser.datum.Datum;
@@ -31,6 +21,7 @@ import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NaiveEvaluator implements Evaluator {
@@ -78,7 +69,7 @@ public class NaiveEvaluator implements Evaluator {
 
         @Override
         public void visit(Keyword keyword) {
-            // TODO not possible
+            throw new EvaluatingException("cannot evaluate a keyword " + keyword);
         }
 
         @Override
@@ -89,14 +80,17 @@ public class NaiveEvaluator implements Evaluator {
                 throw new EvaluatingException("not applicable", operator);
             }
             Function function = (Function) applicable;
-//            function.inspect()
 
             List<? extends Expression> operands = procedureCall.getOperands();
-            List<BudObject> arguments = new ArrayList<BudObject>(operands.size());
+
+            List<BudType> argTypes = new ArrayList<>(operands.size());
+            List<BudObject> arguments = new ArrayList<>(operands.size());
             for (Expression operand : operands) {
                 BudObject arg = evaluate(operand, environment);
+                argTypes.add(arg.getType());
                 arguments.add(arg);
             }
+            function.inspect(argTypes);
             evaluated = function.apply(arguments);
         }
 
@@ -109,18 +103,87 @@ public class NaiveEvaluator implements Evaluator {
         }
 
         @Override
+        public void visit(IfSpecialForm ifSpecialForm) {
+            Expression test = ifSpecialForm.getTest();
+            BudObject tested = evaluate(test, environment);
+            if (!BudBoolean.FALSE.equals(tested)) { // any object not #f is treated as true
+                evaluated = evaluate(ifSpecialForm.getConsequent(), environment);
+            } else {
+                evaluated = evaluate(ifSpecialForm.getAlternate(), environment);
+            }
+        }
+
+        @Override
+        public void visit(AndSpecialForm andSpecialForm) {
+            List<Expression> tests = andSpecialForm.getTests();
+            BudObject eachTested = BudBoolean.TRUE;
+            for (Expression test : tests) {
+                eachTested = evaluate(test, environment);
+                if (BudBoolean.FALSE.equals(eachTested)) {
+                    evaluated = eachTested;
+                    return;
+                }
+            }
+            evaluated = eachTested;
+        }
+
+        @Override
+        public void visit(OrSpecialForm orSpecialForm) {
+            List<Expression> tests = orSpecialForm.getTests();
+            BudObject eachTested = BudBoolean.FALSE;
+            for (Expression test : tests) {
+                eachTested = evaluate(test, environment);
+                if (!BudBoolean.FALSE.equals(eachTested)) {
+                    evaluated = eachTested;
+                    return;
+                }
+            }
+            evaluated = eachTested;
+        }
+
+        @Override
+        public void visit(ConditionSpecialForm conditionSpecialForm) {
+            List<ConditionClause> clauses = conditionSpecialForm.getClauses();
+            for (ConditionClause clause : clauses) {
+                Expression test = clause.getTest();
+                BudObject tested = evaluate(test, environment);
+                if (BudBoolean.FALSE.equals(tested)) {
+                    continue;
+                }
+
+                if (clause.hasRecipient()) {
+                    Expression recipient = clause.getRecipient();
+                    BudObject recipientObj = evaluate(recipient, environment);
+                    if (!BudType.Category.FUNCTION.equals(recipientObj.getType().getCategory())) {
+                        throw new NotApplicableException(recipient);
+                    }
+                    Function recipientFunction = (Function) recipientObj;
+                    recipientFunction.inspect(Collections.singletonList(tested.getType()));
+                    evaluated = recipientFunction.apply(Collections.singletonList(tested));
+                } else {
+                    Expression consequent = clause.getConsequent();
+                    evaluated = evaluate(consequent, environment);
+                }
+                return;
+            }
+            Expression elseExpression = conditionSpecialForm.getElseExpression();
+            if (elseExpression == null) {
+                throw new EvaluatingException("all clauses in cond are evaluated to false values and " +
+                        "no else-clause is found",
+                        conditionSpecialForm);
+            } else {
+                evaluated = evaluate(elseExpression, environment);
+            }
+        }
+
+        @Override
         public void visit(LambdaExpression lambdaExpression) {
             evaluated = new LambdaFunction(lambdaExpression, environment, NaiveEvaluator.this);
         }
 
         @Override
-        public void visit(Definition definition) {
-            // TODO return new Environment
-        }
-
-        @Override
         public void visit(Expression other) {
-            // TODO unknown
+            throw new EvaluatingException("unknown expression", other);
         }
     }
 
@@ -151,7 +214,7 @@ public class NaiveEvaluator implements Evaluator {
         @Override
         public void visit(CompoundDatum compoundDatum) {
             List<Datum> data = compoundDatum.getData();
-            List<BudObject> objects = new ArrayList<BudObject>(data.size());
+            List<BudObject> objects = new ArrayList<>(data.size());
             for (Datum datum : data) {
                 DatumObjectConstructor constructor = new DatumObjectConstructor();
                 datum.accept(constructor);

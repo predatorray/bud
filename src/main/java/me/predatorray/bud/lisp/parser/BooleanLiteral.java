@@ -19,4 +19,24 @@ public class BooleanLiteral extends TokenLocatedExpression {
     public boolean getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return value ? "#t" : "#f";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BooleanLiteral that = (BooleanLiteral) o;
+
+        return value == that.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return (value ? 1 : 0);
+    }
 }

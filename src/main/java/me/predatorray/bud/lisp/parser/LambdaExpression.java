@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
+import me.predatorray.bud.lisp.util.StringUtils;
 import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.List;
@@ -54,5 +55,16 @@ public class LambdaExpression extends TokenLocatedExpression {
 
     public Expression getBodyExpression() {
         return bodyExpression;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("(lambda (");
+        sb.append(StringUtils.join(formals, " ")).append(")");
+        if (!definitions.isEmpty()) {
+            sb.append(" ").append(StringUtils.join(definitions, " "));
+        }
+        sb.append(" ").append(bodyExpression).append(")");
+        return sb.toString();
     }
 }

@@ -1,19 +1,7 @@
 package me.predatorray.bud.lisp.parser.datum;
 
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
-import me.predatorray.bud.lisp.parser.BooleanLiteral;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.ExpressionVisitor;
-import me.predatorray.bud.lisp.parser.Keyword;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.NotApplicableException;
-import me.predatorray.bud.lisp.parser.NumberLiteral;
-import me.predatorray.bud.lisp.parser.ParserException;
-import me.predatorray.bud.lisp.parser.ProcedureCall;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.StringLiteral;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.util.StringUtils;
 
 import java.util.ArrayList;
@@ -125,28 +113,14 @@ public class CompoundDatum implements Datum {
                 compoundExpression = new QuoteSpecialForm(quoted, leftParenthesis);
             }
 
-            // (define <variable> <expression>)
-            else if ("define".equals(keyword.getKeywordName())) {
-                if (operandSize != 2) {
-                    throw new ParserException("malformed definition " + data);
-                }
-                Datum variableDatum = operands.get(0);
-                Expression variable = variableDatum.getExpression();
-                if (!(variable instanceof Variable)) {
-                    throw new ParserException("a variable is expected here, but is " + variableDatum, variable);
-                }
-                Expression defExpr = operands.get(1).getExpression();
-                compoundExpression = new Definition(((Variable) variable), defExpr, leftParenthesis);
-            }
-
             // (lambda <formals> <body>)
             else if ("lambda".equals(keyword.getKeywordName())) {
                 if (operandSize < 2) {
-                    throw new ParserException("malformed lambda expression " + data);
+                    throw new ParserException("malformed lambda expression " + CompoundDatum.this);
                 }
 
                 Datum formalsDatum = operands.get(0);
-                List<Variable> formals = new LinkedList<Variable>();
+                List<Variable> formals = new LinkedList<>();
                 if (formalsDatum instanceof SymbolDatum) {
                     Variable variable = asFormalVariable(formalsDatum);
                     formals.add(variable);
@@ -156,12 +130,13 @@ public class CompoundDatum implements Datum {
                         formals.add(variable);
                     }
                 } else {
-                    throw new ParserException("malformed lambda expression " + data);
+                    throw new ParserException("malformed lambda expression " + CompoundDatum.this);
                 }
 
                 List<Datum> definitionData = operands.subList(1, operandSize - 1);
                 if (!definitionData.isEmpty()) {
-                    throw new ParserException("definition in a lambda body is currently not supported " + data);
+                    throw new ParserException("definition in a lambda body is currently not supported " +
+                            CompoundDatum.this);
                 }
                 List<Definition> definitions = Collections.emptyList(); // TODO
 
@@ -169,20 +144,121 @@ public class CompoundDatum implements Datum {
                 compoundExpression = new LambdaExpression(formals, definitions, bodyExpression, leftParenthesis);
             }
 
-            else {
-                throw new ParserException("not an expression " + data);
+            // (if <test> <consequent> <alternate>)
+            else if ("if".equals(keyword.getKeywordName())) {
+                if (operandSize != 3) {
+                    throw new ParserException("malformed if expression " + CompoundDatum.this);
+                }
+
+                Datum test = operands.get(0);
+                Datum consequent = operands.get(1);
+                Datum alternate = operands.get(2);
+                compoundExpression = new IfSpecialForm(test.getExpression(), consequent.getExpression(),
+                        alternate.getExpression(), leftParenthesis);
+            }
+
+            // (and <test>*)
+            else if ("and".equals(keyword.getKeywordName())) {
+                compoundExpression = new AndSpecialForm(toExpressions(operands), leftParenthesis);
+            }
+
+            // (or <test>*)
+            else if ("or".equals(keyword.getKeywordName())) {
+                List<Expression> tests = new ArrayList<>(operandSize);
+                for (Datum operand : operands) {
+                    tests.add(operand.getExpression());
+                }
+                compoundExpression = new OrSpecialForm(tests, leftParenthesis);
+            }
+
+            // (cond <clause>+) | (cond <clause>* <else-clause>)
+            //
+            // clause := (<test> <consequent>)
+            //         | (<test> => (recipient))
+            //
+            // else-clause := (else <expression>)
+            else if ("cond".equals(keyword.getKeywordName())) {
+                if (operandSize < 1) {
+                    throw new ParserException("cond special form must have at least one clause " + CompoundDatum.this);
+                }
+
+                List<ConditionClause> clauses = new ArrayList<>(operandSize);
+                Expression elseExpression = null;
+                for (int i = 0; i < operandSize; i++) {
+                    Datum operand = operands.get(i);
+                    if (!(operand instanceof CompoundDatum)) {
+                        throw new ParserException("malformed cond special form " + CompoundDatum.this);
+                    }
+
+                    List<Datum> data = ((CompoundDatum) operand).getData();
+                    int clauseElements = data.size();
+                    if (clauseElements > 3 || clauseElements < 1) {
+                        throw new ParserException("malformed clause of cond special form " + CompoundDatum.this);
+                    }
+
+                    List<Expression> condOperandExpressions = toExpressions(data);
+
+                    Expression first = condOperandExpressions.get(0);
+                    Expression second = condOperandExpressions.get(1);
+                    if (i == operandSize - 1
+                            && first instanceof Keyword
+                            && "else".equals(((Keyword) first).getKeywordName())) { // else-clause
+                        elseExpression = second;
+                        break;
+                    }
+
+                    ConditionClause clause;
+                    switch (clauseElements) {
+                        case 1:
+                            clause = ConditionClause.newConditionClauseOfTestAlone(condOperandExpressions.get(0));
+                            break;
+                        case 2:
+                            clause = ConditionClause.newConditionClauseOfConsequentExpression(
+                                    first, condOperandExpressions.get(1));
+                            break;
+                        case 3:
+                        default:
+                            if (!(second instanceof Keyword)) {
+                                throw new ParserException("malformed clause of cond special form " +
+                                        CompoundDatum.this);
+                            }
+                            if (!"=>".equals(((Keyword) second).getKeywordName())) {
+                                throw new ParserException("malformed clause of cond special form " +
+                                        CompoundDatum.this);
+                            }
+                            clause = ConditionClause.newConditionClauseOfRecipientExpression(
+                                    first, condOperandExpressions.get(2));
+                            break;
+                    }
+                    clauses.add(clause);
+                }
+                compoundExpression = new ConditionSpecialForm(clauses, elseExpression, leftParenthesis);
+            }
+
+            else if (keyword.isExpressionKeyword()) {
+                throw new ParserException(keyword + " is not supported");
+            } else {
+                throw new ParserException("not an expression " + CompoundDatum.this);
             }
         }
 
         private Variable asFormalVariable(Datum datum) {
             if (!(datum instanceof SymbolDatum)) {
-                throw new ParserException("malformed lambda expression " + data);
+                throw new ParserException("malformed lambda expression " + CompoundDatum.this);
             }
             Expression variable = datum.getExpression();
             if (!(variable instanceof Variable)) {
-                throw new ParserException("malformed lambda expression " + data);
+                throw new ParserException("malformed lambda expression " + CompoundDatum.this);
             }
             return (Variable) variable;
+        }
+
+        private List<Expression> toExpressions(List<Datum> data) {
+            List<Expression> expressions = new ArrayList<>(data.size());
+            for (Datum datum : data) {
+                expressions.add(datum.getExpression());
+            }
+            return expressions;
         }
 
         @Override
@@ -196,13 +272,28 @@ public class CompoundDatum implements Datum {
         }
 
         @Override
-        public void visit(LambdaExpression lambdaExpression) {
-            constructProcedureCall(lambdaExpression);
+        public void visit(IfSpecialForm ifSpecialForm) {
+            constructProcedureCall(ifSpecialForm);
         }
 
         @Override
-        public void visit(Definition definition) {
-            throw new NotApplicableException(definition);
+        public void visit(AndSpecialForm andSpecialForm) {
+            constructProcedureCall(andSpecialForm);
+        }
+
+        @Override
+        public void visit(OrSpecialForm orSpecialForm) {
+            constructProcedureCall(orSpecialForm);
+        }
+
+        @Override
+        public void visit(ConditionSpecialForm conditionSpecialForm) {
+            constructProcedureCall(conditionSpecialForm);
+        }
+
+        @Override
+        public void visit(LambdaExpression lambdaExpression) {
+            constructProcedureCall(lambdaExpression);
         }
 
         @Override
@@ -212,7 +303,7 @@ public class CompoundDatum implements Datum {
 
         private void constructProcedureCall(Expression operator) {
             assert operands != null;
-            List<Expression> operandExpressions = new ArrayList<Expression>(operands.size());
+            List<Expression> operandExpressions = new ArrayList<>(operands.size());
             for (Datum operand : operands) {
                 operandExpressions.add(operand.getExpression());
             }

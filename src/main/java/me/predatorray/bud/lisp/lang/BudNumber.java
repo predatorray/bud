@@ -35,4 +35,9 @@ public class BudNumber implements BudObject {
     public BigDecimal getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 }

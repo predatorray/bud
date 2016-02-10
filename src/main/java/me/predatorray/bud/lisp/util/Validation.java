@@ -19,6 +19,12 @@ public final class Validation {
         }
     }
 
+    public static <T> void that(boolean condition) {
+        if (!condition) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     public static <T extends Collection<?>> T notEmpty(T collection) {
         return notEmpty(collection, null);
     }

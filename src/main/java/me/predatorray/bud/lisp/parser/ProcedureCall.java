@@ -4,13 +4,13 @@ import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 
 import java.util.List;
 
-public class ProcedureCall extends TokenLocatedExpression {
+public class ProcedureCall extends CompoundExpression {
 
     private final Expression operator;
     private final List<? extends Expression> operands;
 
     public ProcedureCall(Expression operator, List<? extends Expression> operands, LeftParenthesis leading) {
-        super(leading);
+        super(leading, operator.toString(), operands);
         this.operator = operator;
         this.operands = operands;
     }

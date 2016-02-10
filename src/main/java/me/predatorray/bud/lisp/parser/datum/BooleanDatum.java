@@ -41,4 +41,9 @@ public class BooleanDatum implements Datum {
     public boolean getValue() {
         return booleanToken.getValue();
     }
+
+    @Override
+    public String toString() {
+        return booleanToken.toString();
+    }
 }

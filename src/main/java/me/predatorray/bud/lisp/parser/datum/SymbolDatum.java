@@ -43,6 +43,11 @@ public class SymbolDatum implements Datum {
         return identifierToken.hashCode();
     }
 
+    @Override
+    public String toString() {
+        return identifierToken.toString();
+    }
+
     public String getName() {
         return identifierToken.getName();
     }

@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.lexer.StringToken;
+import me.predatorray.bud.lisp.util.StringUtils;
 
 public class StringLiteral extends TokenLocatedExpression {
 
@@ -33,5 +34,10 @@ public class StringLiteral extends TokenLocatedExpression {
     @Override
     public int hashCode() {
         return value.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return StringUtils.quote(value);
     }
 }
