@@ -1,5 +1,8 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.lang.BudObject;
+import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.LambdaFunction;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.StringUtils;
 import me.predatorray.bud.lisp.util.Validation;
@@ -23,6 +26,11 @@ public class LambdaExpression extends TokenLocatedExpression {
     @Override
     public void accept(ExpressionVisitor expressionVisitor) {
         expressionVisitor.visit(this);
+    }
+
+    @Override
+    public BudObject evaluate(Environment environment) {
+        return new LambdaFunction(this, environment);
     }
 
     @Override

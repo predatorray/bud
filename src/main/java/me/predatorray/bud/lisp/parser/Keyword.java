@@ -1,5 +1,8 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.evaluator.EvaluatingException;
+import me.predatorray.bud.lisp.lang.BudObject;
+import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.util.Sets;
 import me.predatorray.bud.lisp.util.Validation;
@@ -34,6 +37,11 @@ public class Keyword extends TokenLocatedExpression {
     @Override
     public void accept(ExpressionVisitor expressionVisitor) {
         expressionVisitor.visit(this);
+    }
+
+    @Override
+    public BudObject evaluate(Environment environment) {
+        throw new EvaluatingException("cannot evaluate a keyword", this);
     }
 
     public String getKeywordName() {

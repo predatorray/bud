@@ -1,7 +1,13 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.evaluator.EvaluatingException;
+import me.predatorray.bud.lisp.lang.BudObject;
+import me.predatorray.bud.lisp.lang.BudType;
+import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.Function;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProcedureCall extends CompoundExpression {
@@ -18,6 +24,25 @@ public class ProcedureCall extends CompoundExpression {
     @Override
     public void accept(ExpressionVisitor expressionVisitor) {
         expressionVisitor.visit(this);
+    }
+
+    @Override
+    public BudObject evaluate(Environment environment) {
+        BudObject applicable = operator.evaluate(environment);
+        if (!BudType.Category.FUNCTION.equals(applicable.getType().getCategory())) {
+            throw new EvaluatingException("not applicable", operator);
+        }
+        Function function = (Function) applicable;
+
+        List<BudType> argTypes = new ArrayList<>(operands.size());
+        List<BudObject> arguments = new ArrayList<>(operands.size());
+        for (Expression operand : operands) {
+            BudObject arg = operand.evaluate(environment);
+            argTypes.add(arg.getType());
+            arguments.add(arg);
+        }
+        function.inspect(argTypes);
+        return function.apply(arguments);
     }
 
     @Override

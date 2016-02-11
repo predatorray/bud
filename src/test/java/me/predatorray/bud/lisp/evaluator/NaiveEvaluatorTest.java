@@ -2,8 +2,23 @@ package me.predatorray.bud.lisp.evaluator;
 
 import me.predatorray.bud.lisp.buitin.BuiltinsEnvironment;
 import me.predatorray.bud.lisp.buitin.EqualPredicate;
-import me.predatorray.bud.lisp.lang.*;
-import me.predatorray.bud.lisp.parser.*;
+import me.predatorray.bud.lisp.lang.BudBoolean;
+import me.predatorray.bud.lisp.lang.BudList;
+import me.predatorray.bud.lisp.lang.BudNumber;
+import me.predatorray.bud.lisp.lang.BudObject;
+import me.predatorray.bud.lisp.lang.BudString;
+import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.Symbol;
+import me.predatorray.bud.lisp.parser.AndSpecialForm;
+import me.predatorray.bud.lisp.parser.ConditionClause;
+import me.predatorray.bud.lisp.parser.ConditionSpecialForm;
+import me.predatorray.bud.lisp.parser.Definition;
+import me.predatorray.bud.lisp.parser.Expression;
+import me.predatorray.bud.lisp.parser.IfSpecialForm;
+import me.predatorray.bud.lisp.parser.LambdaExpression;
+import me.predatorray.bud.lisp.parser.OrSpecialForm;
+import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
+import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.test.AbstractBudLispTest;
 import org.junit.Test;
 
@@ -133,33 +148,31 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
     @Test
     public void testEvaluateAnd1() throws Exception {
         // (and #f #t) ==> #f
-        NaiveEvaluator spied = spy(new NaiveEvaluator());
-        Expression falseExpression = newBooleanLiteral(false);
-        Expression trueExpression = newBooleanLiteral(true);
+        Expression falseExpression = spy(newBooleanLiteral(false));
+        Expression trueExpression = spy(newBooleanLiteral(true));
         Expression andSpecialForm = new AndSpecialForm(Arrays.asList(falseExpression, trueExpression), LP);
 
-        BudObject evaluated = spied.evaluate(andSpecialForm, EMPTY_ENV);
+        BudObject evaluated = sut.evaluate(andSpecialForm, EMPTY_ENV);
 
         assertEquals("(and #f #t) ==> #f", BudBoolean.FALSE, evaluated);
-        verify(spied).evaluate(same(falseExpression), same(EMPTY_ENV));
-        verify(spied, never()).evaluate(same(trueExpression), same(EMPTY_ENV));
+        verify(falseExpression).evaluate(same(EMPTY_ENV));
+        verify(trueExpression, never()).evaluate(same(EMPTY_ENV));
     }
 
     @Test
     public void testEvaluateAnd2() throws Exception {
         // (and '() "false") ==> "false"
-        NaiveEvaluator spied = spy(new NaiveEvaluator());
         Expression[] tests = new Expression[] {
-                newQuoteSpecialForm(newCompoundDatum()),
-                newStringLiteral("false")
+                spy(newQuoteSpecialForm(newCompoundDatum())),
+                spy(newStringLiteral("false"))
         };
         Expression andSpecialForm = new AndSpecialForm(Arrays.asList(tests), LP);
 
-        BudObject evaluated = spied.evaluate(andSpecialForm, EMPTY_ENV);
+        BudObject evaluated = sut.evaluate(andSpecialForm, EMPTY_ENV);
 
         assertEquals("(and '() \"false\") ==> \"false\"", new BudString("false"), evaluated);
-        verify(spied).evaluate(same(tests[0]), same(EMPTY_ENV));
-        verify(spied).evaluate(same(tests[1]), same(EMPTY_ENV));
+        verify(tests[0]).evaluate(same(EMPTY_ENV));
+        verify(tests[1]).evaluate(same(EMPTY_ENV));
     }
 
     @Test
@@ -173,31 +186,29 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
     @Test
     public void testEvaluateOr1() throws Exception {
         // (or #t #f) ==> #t
-        NaiveEvaluator spied = spy(new NaiveEvaluator());
-        Expression trueExpression = newBooleanLiteral(true);
-        Expression falseExpression = newBooleanLiteral(false);
+        Expression trueExpression = spy(newBooleanLiteral(true));
+        Expression falseExpression = spy(newBooleanLiteral(false));
         Expression orSpecialForm = new OrSpecialForm(Arrays.asList(trueExpression, falseExpression), LP);
 
-        BudObject evaluated = spied.evaluate(orSpecialForm, EMPTY_ENV);
+        BudObject evaluated = sut.evaluate(orSpecialForm, EMPTY_ENV);
 
         assertEquals("(or #t #f) ==> #t", BudBoolean.TRUE, evaluated);
-        verify(spied).evaluate(same(trueExpression), same(EMPTY_ENV));
-        verify(spied, never()).evaluate(same(falseExpression), same(EMPTY_ENV));
+        verify(trueExpression).evaluate(same(EMPTY_ENV));
+        verify(falseExpression, never()).evaluate(same(EMPTY_ENV));
     }
 
     @Test
     public void testEvaluateOr2() throws Exception {
         // (or '() #f) ==> #t
-        NaiveEvaluator spied = spy(new NaiveEvaluator());
-        Expression trueExpression = newBooleanLiteral(true);
-        Expression falseExpression = newBooleanLiteral(false);
+        Expression trueExpression = spy(newBooleanLiteral(true));
+        Expression falseExpression = spy(newBooleanLiteral(false));
         Expression orSpecialForm = new OrSpecialForm(Arrays.asList(trueExpression, falseExpression), LP);
 
-        BudObject evaluated = spied.evaluate(orSpecialForm, EMPTY_ENV);
+        BudObject evaluated = sut.evaluate(orSpecialForm, EMPTY_ENV);
 
         assertEquals("(or '() #f) ==> #t", BudBoolean.TRUE, evaluated);
-        verify(spied).evaluate(same(trueExpression), same(EMPTY_ENV));
-        verify(spied, never()).evaluate(same(falseExpression), same(EMPTY_ENV));
+        verify(trueExpression).evaluate(same(EMPTY_ENV));
+        verify(falseExpression, never()).evaluate(same(EMPTY_ENV));
     }
 
     @Test
@@ -211,10 +222,9 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
     @Test
     public void testEvaluateCond1() throws Exception {
         // (cond (#t "1") (#f "2")) ==> "1"
-        NaiveEvaluator spied = spy(new NaiveEvaluator());
         Expression[] tests = new Expression[] {
-                newBooleanLiteral(true),
-                newBooleanLiteral(false)
+                spy(newBooleanLiteral(true)),
+                spy(newBooleanLiteral(false))
         };
         ConditionClause[] conditionClauses = new ConditionClause[] {
                 ConditionClause.newConditionClauseOfConsequentExpression(tests[0], newStringLiteral("1")),
@@ -222,11 +232,11 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         };
         Expression condSpecialForm = new ConditionSpecialForm(Arrays.asList(conditionClauses), null, LP);
 
-        BudObject evaluated = spied.evaluate(condSpecialForm, EMPTY_ENV);
+        BudObject evaluated = sut.evaluate(condSpecialForm, EMPTY_ENV);
 
         assertEquals("(cond (#t \"1\") (#f \"2\")) ==> \"1\"", new BudString("1"), evaluated);
-        verify(spied).evaluate(same(tests[0]), same(EMPTY_ENV));
-        verify(spied, never()).evaluate(same(tests[1]), same(EMPTY_ENV));
+        verify(tests[0]).evaluate(same(EMPTY_ENV));
+        verify(tests[1], never()).evaluate(same(EMPTY_ENV));
     }
 
     @Test(expected = EvaluatingException.class)
@@ -248,10 +258,9 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
     @Test
     public void testEvaluateCond3() throws Exception {
         // (cond (#f "1") (#f "2") (else "3")) ==> "3"
-        NaiveEvaluator spied = spy(new NaiveEvaluator());
         Expression[] tests = new Expression[] {
-                newBooleanLiteral(false),
-                newBooleanLiteral(false)
+                spy(newBooleanLiteral(false)),
+                spy(newBooleanLiteral(false))
         };
         ConditionClause[] conditionClauses = new ConditionClause[] {
                 ConditionClause.newConditionClauseOfConsequentExpression(tests[0], newStringLiteral("1")),
@@ -260,11 +269,11 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         Expression elseExpression = newStringLiteral("3");
         Expression condSpecialForm = new ConditionSpecialForm(Arrays.asList(conditionClauses), elseExpression, LP);
 
-        BudObject evaluated = spied.evaluate(condSpecialForm, EMPTY_ENV);
+        BudObject evaluated = sut.evaluate(condSpecialForm, EMPTY_ENV);
 
         assertEquals("(cond (#f \"1\") (#f \"2\") (else \"3\")) ==> \"3\"", new BudString("3"), evaluated);
-        verify(spied).evaluate(same(tests[0]), same(EMPTY_ENV));
-        verify(spied).evaluate(same(tests[1]), same(EMPTY_ENV));
+        verify(tests[0]).evaluate(same(EMPTY_ENV));
+        verify(tests[1]).evaluate(same(EMPTY_ENV));
     }
 
     @Test

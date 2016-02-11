@@ -1,7 +1,6 @@
 package me.predatorray.bud.lisp.lang;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
-import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.parser.Definition;
 import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.LambdaExpression;
@@ -19,13 +18,11 @@ public class LambdaFunction implements Function {
     private final Expression body;
 
     private final LambdaExpression lambdaExpression;
-    private final Evaluator evaluator;
     private final Environment lexicalEnv;
 
-    public LambdaFunction(LambdaExpression lambdaExpression, Environment lexicalEnv, Evaluator evaluator) {
+    public LambdaFunction(LambdaExpression lambdaExpression, Environment lexicalEnv) {
         this.lambdaExpression = lambdaExpression;
         this.lexicalEnv = lexicalEnv;
-        this.evaluator = evaluator;
         thisType = new FunctionType(this);
         this.formals = lambdaExpression.getFormals();
         this.definitions = lambdaExpression.getDefinitions();
@@ -46,7 +43,7 @@ public class LambdaFunction implements Function {
             throw new EvaluatingException(msg, lambdaExpression);
         }
 
-        Map<Variable, BudObject> argumentBindings = new HashMap<Variable, BudObject>(actualSize);
+        Map<Variable, BudObject> argumentBindings = new HashMap<>(actualSize);
         for (int i = 0; i < actualSize; i++) {
             Variable formal = formals.get(i);
             BudObject actual = arguments.get(i);
@@ -57,11 +54,11 @@ public class LambdaFunction implements Function {
         for (Definition definition : definitions) {
             Environment env = envDefined.toEnvironment();
             Variable variable = definition.getVariable();
-            BudObject defined = evaluator.evaluate(definition.getExpression(), env);
+            BudObject defined = definition.getExpression().evaluate(env);
             envDefined.bind(variable, defined);
         }
         Environment enclosing = new Environment(argumentBindings, envDefined.toEnvironment());
-        return evaluator.evaluate(body, enclosing);
+        return body.evaluate(enclosing);
     }
 
     @Override
