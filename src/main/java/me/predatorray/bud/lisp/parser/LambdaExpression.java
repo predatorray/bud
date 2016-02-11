@@ -15,7 +15,7 @@ public class LambdaExpression extends TokenLocatedExpression {
     public LambdaExpression(List<Variable> formals, List<Definition> definitions, Expression bodyExpression,
                             LeftParenthesis leading) {
         super(leading);
-        this.formals = Validation.notEmpty(formals, "formals must not be empty");
+        this.formals = Validation.notNull(formals, "formals must not be empty");
         this.definitions = Validation.notNull(definitions);
         this.bodyExpression = Validation.notNull(bodyExpression);
     }

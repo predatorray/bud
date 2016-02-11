@@ -51,7 +51,6 @@ public class LambdaFunction implements Function {
             Variable formal = formals.get(i);
             BudObject actual = arguments.get(i);
             argumentBindings.put(formal, actual);
-
         }
 
         MutableEnvironment envDefined = new MutableEnvironment(lexicalEnv);

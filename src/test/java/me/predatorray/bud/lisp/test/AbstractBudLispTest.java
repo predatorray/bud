@@ -16,6 +16,7 @@ import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.parser.datum.BooleanDatum;
 import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
 import me.predatorray.bud.lisp.parser.datum.Datum;
+import me.predatorray.bud.lisp.parser.datum.NumberDatum;
 import me.predatorray.bud.lisp.parser.datum.StringDatum;
 import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
 
@@ -61,6 +62,14 @@ public abstract class AbstractBudLispTest {
 
     protected SymbolDatum newSymbolDatum(String symbol) {
         return new SymbolDatum(new IdentifierToken(symbol, DUMMY_LOCATION));
+    }
+
+    protected NumberDatum newNumberDatum(BigDecimal decimal) {
+        return new NumberDatum(new NumberToken(decimal, DUMMY_LOCATION));
+    }
+
+    protected NumberDatum newNumberDatum(int i) {
+        return newNumberDatum(new BigDecimal(i));
     }
 
     protected StringDatum newStringDatum(String str) {
