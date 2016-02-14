@@ -1,14 +1,13 @@
 package me.predatorray.bud.lisp.lexer;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-@Ignore
 public class LexerTest {
 
     private void assertMatches(List<? extends Token> expectedTokens, String input) {
@@ -17,7 +16,7 @@ public class LexerTest {
         for (Token token : lexer) {
             actual.add(token);
         }
-        Assert.assertEquals(expectedTokens, actual);
+        Assert.assertArrayEquals(expectedTokens.toArray(), actual.toArray());
     }
 
     @Test
@@ -31,5 +30,31 @@ public class LexerTest {
                 new IdentifierToken("b", new TextLocation(1, 6)),
                 new RightParenthesis(new TextLocation(1, 7))),
                 "(+ a b)");
+    }
+
+    @Test
+    public void testLexer2() {
+        assertMatches(Arrays.asList(
+                new LeftParenthesis(new TextLocation(1, 1)),
+                new IdentifierToken("foobar", new TextLocation(1, 2)),
+                new Atmosphere(new TextLocation(1, 8)),
+                new StringToken("str str\n\t\b\f\r\"\'\\", new TextLocation(1, 9)),
+                new RightParenthesis(new TextLocation(1, 34))),
+                "(foobar \"str str\\n\\t\\b\\f\\r\\\"\\\'\\\\\")");
+    }
+
+//    @Ignore
+    @Test
+    public void testLexer3() {
+        assertMatches(Arrays.asList(
+                new Atmosphere(new TextLocation(1, 1)),
+                new NumberToken(new BigDecimal(123), new TextLocation(2, 1)),
+                new Atmosphere(new TextLocation(2, 4)),
+                new SingleQuoteToken(new TextLocation(2, 5)),
+                new IdentifierToken("abc", new TextLocation(2, 6)),
+                new Atmosphere(new TextLocation(2, 9)),
+                new Atmosphere(new TextLocation(2, 10)),
+                new IdentifierToken("xyz", new TextLocation(2, 11))),
+                "\n123 'abc  xyz");
     }
 }

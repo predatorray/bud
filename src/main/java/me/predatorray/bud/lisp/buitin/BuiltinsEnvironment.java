@@ -1,6 +1,11 @@
 package me.predatorray.bud.lisp.buitin;
 
 import me.predatorray.bud.lisp.buitin.arithmetic.AddFunction;
+import me.predatorray.bud.lisp.buitin.arithmetic.MonoDecreasingPredicate;
+import me.predatorray.bud.lisp.buitin.arithmetic.MonoIncreasingPredicate;
+import me.predatorray.bud.lisp.buitin.arithmetic.MonoNondecreasingPredicate;
+import me.predatorray.bud.lisp.buitin.arithmetic.MonoNonincreasingPredicate;
+import me.predatorray.bud.lisp.buitin.arithmetic.NumberEqualPredicate;
 import me.predatorray.bud.lisp.buitin.arithmetic.SubtractFunction;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
@@ -25,6 +30,11 @@ public class BuiltinsEnvironment {
 
         initial.put("+", new AddFunction());
         initial.put("-", new SubtractFunction());
+        initial.put("=", new NumberEqualPredicate());
+        initial.put("<", new MonoIncreasingPredicate());
+        initial.put(">", new MonoDecreasingPredicate());
+        initial.put(">=", new MonoNonincreasingPredicate());
+        initial.put("<=", new MonoNondecreasingPredicate());
 
         initial.put("null-environment", new NullEnvironmentFunction());
         initial.put("builtins-environment", new BuiltinsEnvironmentFunction());

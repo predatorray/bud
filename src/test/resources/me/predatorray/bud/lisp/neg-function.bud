@@ -1,0 +1,4 @@
+((lambda (plus-five neg)
+         ((neg plus-five) 10)) (lambda (n) (+ n 5))
+                               (lambda (numeric-fn)
+                                       (lambda (n) (- (numeric-fn n)))))
