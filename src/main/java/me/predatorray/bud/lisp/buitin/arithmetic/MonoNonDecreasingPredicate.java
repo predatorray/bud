@@ -6,7 +6,7 @@ import me.predatorray.bud.lisp.lang.BudNumber;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class MonoNondecreasingPredicate extends NumericalPredicate {
+public class MonoNonDecreasingPredicate extends NumericalPredicate {
 
     @Override
     protected void checkArgumentSize(int size) {
