@@ -28,7 +28,7 @@ public class DatumParserVisitor implements TokenVisitor {
     private void appendOnTopOfStack(Datum datum) {
         List<Datum> top = dataStack.peek();
         if (top == null) {
-            throw new ParserException(); // TODO
+            throw new ParserException("parentheses are not balanced");
         }
         top.add(datum);
     }

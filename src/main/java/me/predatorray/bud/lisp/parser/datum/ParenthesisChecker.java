@@ -20,8 +20,8 @@ class ParenthesisChecker implements TokenVisitor {
     private final Map<RightParenthesis, LeftParenthesis> parenthesisMap;
 
     public ParenthesisChecker() {
-        leftParenthesisStack = new Stack<LeftParenthesis>();
-        parenthesisMap = new HashMap<RightParenthesis, LeftParenthesis>();
+        leftParenthesisStack = new Stack<>();
+        parenthesisMap = new HashMap<>();
     }
 
     @Override

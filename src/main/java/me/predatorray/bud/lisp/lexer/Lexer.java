@@ -1,12 +1,11 @@
 package me.predatorray.bud.lisp.lexer;
 
 import me.predatorray.bud.lisp.util.Sets;
+import me.predatorray.bud.lisp.util.StringEscapeUtils;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -62,7 +61,17 @@ class LexerIterator implements Iterator<Token> {
             ++location[1];
 
             if (currIndex >= source.length()) {
-                throw new RuntimeException("EOF"); // TODO EOF
+                // eof
+                switch (state) {
+                    case WITHIN_DOUBLE_QUOTES:
+                        throw new LexerException("Double quotes are not closed, but EOF has been reached.");
+                    case AFTER_BACKSLASH:
+                    case BACKSLASH_EOL:
+                        throw new LexerException("More characters after backslash are expected, " +
+                                "but EOF has been reached.");
+                    default:
+                        throw new LexerException("Unexpected EOF");
+                }
             }
 
             char currChar = source.charAt(currIndex);
@@ -83,17 +92,17 @@ class LexerIterator implements Iterator<Token> {
                         }
                         break;
                     case AFTER_BACKSLASH:
-                        if (isEscapeSequence(currChar)) {
+                        if (StringEscapeUtils.isEscapeSequence(currChar)) {
                             state = TokenizerState.WITHIN_DOUBLE_QUOTES;
-                            Character unescaped = ESCAPE_SEQUENCE_MAPPING.get(currChar);
+                            Character unescaped = StringEscapeUtils.unescape(currChar);
                             if (unescaped == null) {
-                                throw new IllegalStateException("unknown escape sequence: " + currChar);
+                                throw new LexerException("unknown escape sequence: " + currChar);
                             }
                             doubleQuotedValue.append(unescaped);
                         } else if (currChar == '\n') {
                             state = TokenizerState.BACKSLASH_EOL;
                         } else {
-                            throw new RuntimeException("not a valid escape sequence: " + currChar);
+                            throw new LexerException("not a valid escape sequence: " + currChar);
                         }
                         break;
                     case BACKSLASH_EOL:
@@ -118,7 +127,7 @@ class LexerIterator implements Iterator<Token> {
                                 BigDecimal decimal = new BigDecimal(number);
                                 return new NumberToken(decimal, getCurrentNumberLocation());
                             } catch (NumberFormatException notANumber) {
-                                throw new RuntimeException("not a number: " + number);
+                                throw new LexerException("not a number: " + number);
                             }
                         }
                         break;
@@ -138,7 +147,7 @@ class LexerIterator implements Iterator<Token> {
                                     BigDecimal decimal = new BigDecimal(number);
                                     return new NumberToken(decimal, getCurrentNumberLocation());
                                 } catch (NumberFormatException notANumber) {
-                                    throw new RuntimeException("not a number: " + number);
+                                    throw new LexerException("not a number: " + number);
                                 }
                             }
                             break;
@@ -210,24 +219,6 @@ class LexerIterator implements Iterator<Token> {
         String number = numberValue.toString();
         numberValue.setLength(0);
         return number;
-    }
-
-    private static final Map<Character, Character> ESCAPE_SEQUENCE_MAPPING = new HashMap<>();
-    static {
-        ESCAPE_SEQUENCE_MAPPING.put('n', '\n');
-        ESCAPE_SEQUENCE_MAPPING.put('t', '\t');
-        ESCAPE_SEQUENCE_MAPPING.put('b', '\b');
-        ESCAPE_SEQUENCE_MAPPING.put('f', '\f');
-        ESCAPE_SEQUENCE_MAPPING.put('r', '\r');
-        ESCAPE_SEQUENCE_MAPPING.put('\"', '\"');
-        ESCAPE_SEQUENCE_MAPPING.put('\'', '\'');
-        ESCAPE_SEQUENCE_MAPPING.put('\\', '\\');
-    }
-
-    private static final Set<Character> ESCAPE_SEQUENCES = ESCAPE_SEQUENCE_MAPPING.keySet();
-
-    private static boolean isEscapeSequence(char c) {
-        return ESCAPE_SEQUENCES.contains(c);
     }
 
     private static final Set<Character> WHITESPACES = Sets.asSet(' ', '\n', '\t', '\r');
