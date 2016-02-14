@@ -1,0 +1,7 @@
+((lambda (n)
+         (define (accumulate n res)
+                 (if (equals? n 0)
+                     res
+                     (accumulate (- n 1)
+                                 (+ res n))))
+         (accumulate n 0)) 10000)

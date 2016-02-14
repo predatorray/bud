@@ -14,6 +14,7 @@ public class LambdaExpression extends TokenLocatedExpression {
     private final List<Variable> formals;
     private final List<Definition> definitions;
     private final Expression bodyExpression;
+    private final Variable self;
 
     public LambdaExpression(List<Variable> formals, List<Definition> definitions, Expression bodyExpression,
                             LeftParenthesis leading) {
@@ -21,6 +22,16 @@ public class LambdaExpression extends TokenLocatedExpression {
         this.formals = Validation.notNull(formals, "formals must not be empty");
         this.definitions = Validation.notNull(definitions);
         this.bodyExpression = Validation.notNull(bodyExpression);
+        this.self = null;
+    }
+
+    public LambdaExpression(List<Variable> formals, List<Definition> definitions, Expression bodyExpression,
+                            Variable self, Expression locatedBy) {
+        super(locatedBy);
+        this.formals = Validation.notNull(formals, "formals must not be empty");
+        this.definitions = Validation.notNull(definitions);
+        this.bodyExpression = Validation.notNull(bodyExpression);
+        this.self = self;
     }
 
     @Override
@@ -30,7 +41,7 @@ public class LambdaExpression extends TokenLocatedExpression {
 
     @Override
     public BudObject evaluate(Environment environment) {
-        return new LambdaFunction(this, environment);
+        return new LambdaFunction(this, environment, self);
     }
 
     @Override
@@ -42,7 +53,8 @@ public class LambdaExpression extends TokenLocatedExpression {
 
         if (!formals.equals(that.formals)) return false;
         if (!definitions.equals(that.definitions)) return false;
-        return bodyExpression.equals(that.bodyExpression);
+        if (!bodyExpression.equals(that.bodyExpression)) return false;
+        return self != null ? self.equals(that.self) : that.self == null;
     }
 
     @Override
@@ -50,6 +62,7 @@ public class LambdaExpression extends TokenLocatedExpression {
         int result = formals.hashCode();
         result = 31 * result + definitions.hashCode();
         result = 31 * result + bodyExpression.hashCode();
+        result = 31 * result + (self != null ? self.hashCode() : 0);
         return result;
     }
 

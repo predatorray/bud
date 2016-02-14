@@ -12,18 +12,19 @@ import java.util.Map;
 
 public class LambdaFunction implements Function {
 
-    private final FunctionType thisType;
+    private final FunctionType thisType = new FunctionType(this);
     private final List<Variable> formals;
     private final List<Definition> definitions;
     private final Expression body;
 
     private final LambdaExpression lambdaExpression;
     private final Environment lexicalEnv;
+    private final Variable self;
 
-    public LambdaFunction(LambdaExpression lambdaExpression, Environment lexicalEnv) {
+    public LambdaFunction(LambdaExpression lambdaExpression, Environment lexicalEnv, Variable self) {
         this.lambdaExpression = lambdaExpression;
         this.lexicalEnv = lexicalEnv;
-        thisType = new FunctionType(this);
+        this.self = self;
         this.formals = lambdaExpression.getFormals();
         this.definitions = lambdaExpression.getDefinitions();
         this.body = lambdaExpression.getBodyExpression();
@@ -51,11 +52,11 @@ public class LambdaFunction implements Function {
         }
 
         MutableEnvironment envDefined = new MutableEnvironment(lexicalEnv);
+        if (self != null) {
+            envDefined.bind(self, this);
+        }
         for (Definition definition : definitions) {
-            Environment env = envDefined.toEnvironment();
-            Variable variable = definition.getVariable();
-            BudObject defined = definition.getExpression().evaluate(env);
-            envDefined.bind(variable, defined);
+            definition.bind(envDefined);
         }
         Environment enclosing = new Environment(argumentBindings, envDefined.toEnvironment());
         return body.evaluate(enclosing);
@@ -74,13 +75,15 @@ public class LambdaFunction implements Function {
         LambdaFunction that = (LambdaFunction) o;
 
         if (!lambdaExpression.equals(that.lambdaExpression)) return false;
-        return lexicalEnv.equals(that.lexicalEnv);
+        if (!lexicalEnv.equals(that.lexicalEnv)) return false;
+        return self != null ? self.equals(that.self) : that.self == null;
     }
 
     @Override
     public int hashCode() {
         int result = lambdaExpression.hashCode();
         result = 31 * result + lexicalEnv.hashCode();
+        result = 31 * result + (self != null ? self.hashCode() : 0);
         return result;
     }
 }

@@ -5,6 +5,7 @@ import me.predatorray.bud.lisp.buitin.arithmetic.MonoDecreasingPredicate;
 import me.predatorray.bud.lisp.buitin.arithmetic.MonoIncreasingPredicate;
 import me.predatorray.bud.lisp.buitin.arithmetic.MonoNonDecreasingPredicate;
 import me.predatorray.bud.lisp.buitin.arithmetic.MonoNonIncreasingPredicate;
+import me.predatorray.bud.lisp.buitin.arithmetic.MultiplyFunction;
 import me.predatorray.bud.lisp.buitin.arithmetic.NumberEqualPredicate;
 import me.predatorray.bud.lisp.buitin.arithmetic.SubtractFunction;
 import me.predatorray.bud.lisp.lang.BudObject;
@@ -19,7 +20,7 @@ public class BuiltinsEnvironment {
     static {
         Map<String, BudObject> initial = new HashMap<>();
 
-        initial.put("eq?", new EqualPredicate());
+        initial.put("eq?", new EqPredicate());
         initial.put("equals?", new EqualPredicate());
         initial.put("boolean?", new BooleanPredicate());
         initial.put("string?", new StringPredicate());
@@ -30,6 +31,7 @@ public class BuiltinsEnvironment {
 
         initial.put("+", new AddFunction());
         initial.put("-", new SubtractFunction());
+        initial.put("*", new MultiplyFunction());
         initial.put("=", new NumberEqualPredicate());
         initial.put("<", new MonoIncreasingPredicate());
         initial.put(">", new MonoDecreasingPredicate());

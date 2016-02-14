@@ -1,29 +1,15 @@
 package me.predatorray.bud.lisp;
 
 import me.predatorray.bud.lisp.lang.BudNumber;
-import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudString;
 import me.predatorray.bud.lisp.lang.Symbol;
-import org.junit.Assert;
+import me.predatorray.bud.lisp.test.AbstractInterpreterTest;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-public class BudInterpreterTest {
-
-    private final BudInterpreter interpreter = new BudInterpreter();
-
-    private void assertInterpretCorrectly(BudObject expected, String sourceClasspath)
-            throws URISyntaxException, IOException {
-        Path path = Paths.get(this.getClass().getResource(sourceClasspath).toURI());
-        BudObject actual = interpreter.execute(path);
-        Assert.assertEquals(expected, actual);
-    }
+public class BudInterpreterTest extends AbstractInterpreterTest {
 
     @Test
     public void testNumber1() throws Exception {
@@ -59,5 +45,10 @@ public class BudInterpreterTest {
     @Test
     public void testNegNumericFunction() throws Exception {
         assertInterpretCorrectly(new BudNumber(new BigDecimal(-15)), "neg-function.bud");
+    }
+
+    @Test
+    public void testFactorial() throws Exception {
+        assertInterpretCorrectly(new BudNumber(new BigDecimal(120)), "factorial.bud");
     }
 }

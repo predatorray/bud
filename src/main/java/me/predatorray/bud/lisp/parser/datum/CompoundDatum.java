@@ -1,11 +1,27 @@
 package me.predatorray.bud.lisp.parser.datum;
 
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
-import me.predatorray.bud.lisp.parser.*;
+import me.predatorray.bud.lisp.parser.AndSpecialForm;
+import me.predatorray.bud.lisp.parser.BooleanLiteral;
+import me.predatorray.bud.lisp.parser.ConditionClause;
+import me.predatorray.bud.lisp.parser.ConditionSpecialForm;
+import me.predatorray.bud.lisp.parser.Definition;
+import me.predatorray.bud.lisp.parser.Expression;
+import me.predatorray.bud.lisp.parser.ExpressionVisitor;
+import me.predatorray.bud.lisp.parser.IfSpecialForm;
+import me.predatorray.bud.lisp.parser.Keyword;
+import me.predatorray.bud.lisp.parser.LambdaExpression;
+import me.predatorray.bud.lisp.parser.NotApplicableException;
+import me.predatorray.bud.lisp.parser.NumberLiteral;
+import me.predatorray.bud.lisp.parser.OrSpecialForm;
+import me.predatorray.bud.lisp.parser.ParserException;
+import me.predatorray.bud.lisp.parser.ProcedureCall;
+import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
+import me.predatorray.bud.lisp.parser.StringLiteral;
+import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -134,11 +150,7 @@ public class CompoundDatum implements Datum {
                 }
 
                 List<Datum> definitionData = operands.subList(1, operandSize - 1);
-                if (!definitionData.isEmpty()) {
-                    throw new ParserException("definition in a lambda body is currently not supported " +
-                            CompoundDatum.this);
-                }
-                List<Definition> definitions = Collections.emptyList(); // TODO
+                List<Definition> definitions = parseDefinition(definitionData);
 
                 Expression bodyExpression = operands.get(operandSize - 1).getExpression();
                 compoundExpression = new LambdaExpression(formals, definitions, bodyExpression, leftParenthesis);
@@ -253,12 +265,72 @@ public class CompoundDatum implements Datum {
             return (Variable) variable;
         }
 
+        private List<Variable> asFormalVariables(List<Datum> data) {
+            List<Variable> formals = new ArrayList<>(data.size());
+            for (Datum datum : data) {
+                Variable variable = asFormalVariable(datum);
+                formals.add(variable);
+            }
+            return formals;
+        }
+
         private List<Expression> toExpressions(List<Datum> data) {
             List<Expression> expressions = new ArrayList<>(data.size());
             for (Datum datum : data) {
                 expressions.add(datum.getExpression());
             }
             return expressions;
+        }
+
+        private List<Definition> parseDefinition(List<Datum> data) {
+            List<Definition> definitions = new ArrayList<>(data.size());
+            for (Datum datum : data) {
+                if (!(datum instanceof CompoundDatum)) {
+                    malformedDefinitionInLambda();
+                }
+                CompoundDatum definitionDatum = (CompoundDatum) datum;
+                // (define <variable> <expression>)
+                // (define (<variable> <def-formals>) <body>)
+                List<Datum> definitionData = definitionDatum.getData();
+                if (definitionData.size() != 3) {
+                    malformedDefinitionInLambda();
+                }
+
+                Expression kwDef = definitionData.get(0).getExpression();
+                if (!(kwDef instanceof Keyword) || !((Keyword) kwDef).getKeywordName().equals("define")) {
+                    malformedDefinitionInLambda();
+                }
+
+                Datum defVariableDatum = definitionData.get(1);
+                Expression body = definitionData.get(2).getExpression();
+                if (defVariableDatum instanceof CompoundDatum) {
+                    List<Datum> variableAndFormals = ((CompoundDatum) defVariableDatum).getData();
+                    if (variableAndFormals.size() < 1) {
+                        malformedDefinitionInLambda();
+                    }
+                    Expression variable = variableAndFormals.get(0).getExpression();
+                    if (!(variable instanceof Variable)) {
+                        malformedDefinitionInLambda();
+                    }
+                    List<Variable> formals = asFormalVariables(
+                            variableAndFormals.subList(1, variableAndFormals.size()));
+                    definitions.add(new Definition(((Variable) variable), formals, body)); // TODO
+                } else if (defVariableDatum instanceof SymbolDatum) {
+                    Expression variable = ((SymbolDatum) defVariableDatum).getExpression();
+                    if (!(variable instanceof Variable)) {
+                        malformedDefinitionInLambda();
+                    }
+                    definitions.add(new Definition(((Variable) variable), body));
+                } else {
+                    malformedDefinitionInLambda();
+                }
+            }
+            return definitions;
+        }
+
+        private void malformedDefinitionInLambda() {
+            throw new ParserException("malformed definition expression in lambda expression " +
+                    CompoundDatum.this);
         }
 
         @Override

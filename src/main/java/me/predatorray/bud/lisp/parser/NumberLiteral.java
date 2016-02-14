@@ -34,7 +34,11 @@ public class NumberLiteral extends TokenLocatedExpression {
         NumberLiteral that = (NumberLiteral) o;
 
         return value.equals(that.value);
+    }
 
+    @Override
+    public String toString() {
+        return value.toString();
     }
 
     @Override
