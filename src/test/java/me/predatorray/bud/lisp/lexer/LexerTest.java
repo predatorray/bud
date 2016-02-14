@@ -43,7 +43,6 @@ public class LexerTest {
                 "(foobar \"str str\\n\\t\\b\\f\\r\\\"\\\'\\\\\")");
     }
 
-//    @Ignore
     @Test
     public void testLexer3() {
         assertMatches(Arrays.asList(

@@ -3,10 +3,14 @@ package me.predatorray.bud.lisp.parser;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.lexer.RightParenthesis;
+import me.predatorray.bud.lisp.lexer.SingleQuoteToken;
 import me.predatorray.bud.lisp.lexer.TextLocation;
 import me.predatorray.bud.lisp.lexer.Token;
+import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
+import me.predatorray.bud.lisp.parser.datum.Datum;
 import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -60,6 +64,53 @@ public class ParserTest {
 
         Expression expected = new QuoteSpecialForm(new SymbolDatum(new IdentifierToken("a", DUMMY_LOCATION)), LP);
         assertMatches(expected, input);
+    }
+
+    @Ignore
+    @Test
+    public void testParseQuote2() throws Exception {
+        // 'a
+        SingleQuoteToken quote = new SingleQuoteToken(DUMMY_LOCATION);
+        IdentifierToken a = new IdentifierToken("a", DUMMY_LOCATION);
+        List<Token> input = Arrays.asList(quote, a);
+
+        Expression expected = new QuoteSpecialForm(new SymbolDatum(new IdentifierToken("a", DUMMY_LOCATION)), LP);
+        assertMatches(expected, input);
+    }
+
+    @Ignore
+    @Test
+    public void testParseQuote3() throws Exception {
+        // '(a b)
+        SingleQuoteToken quote = new SingleQuoteToken(DUMMY_LOCATION);
+        IdentifierToken a = new IdentifierToken("a", DUMMY_LOCATION);
+        IdentifierToken b = new IdentifierToken("b", DUMMY_LOCATION);
+        List<Token> input = Arrays.asList(quote, LP, a, b, RP);
+
+        Expression expected = new QuoteSpecialForm(new CompoundDatum(Arrays.<Datum>asList(
+                new SymbolDatum(new IdentifierToken("a", DUMMY_LOCATION)),
+                new SymbolDatum(new IdentifierToken("b", DUMMY_LOCATION))), LP), LP);
+        assertMatches(expected, input);
+    }
+
+    @Ignore
+    @Test
+    public void testParseQuote4() throws Exception {
+        // ''()
+        SingleQuoteToken quote = new SingleQuoteToken(DUMMY_LOCATION);
+        List<Token> input = Arrays.<Token>asList(quote, quote, LP, RP);
+
+        Expression expected = new QuoteSpecialForm(new CompoundDatum(Arrays.asList(
+                new SymbolDatum(new IdentifierToken("quote", DUMMY_LOCATION)),
+                new CompoundDatum(Collections.<Datum>emptyList(), LP)), LP), LP);
+        assertMatches(expected, input);
+    }
+
+    @Ignore
+    @Test
+    public void testParseQuote5() throws Exception {
+        // (a '(b '(c) 'd))
+        // TODO
     }
 
     @Test
