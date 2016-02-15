@@ -17,18 +17,23 @@ public class ListType implements BudType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ListType that = (ListType) o;
+        ListType listType = (ListType) o;
 
-        return elementType.equals(that.elementType);
+        return elementType != null ? elementType.equals(listType.elementType) : listType.elementType == null;
     }
 
     @Override
     public int hashCode() {
-        return elementType.hashCode();
+        return elementType != null ? elementType.hashCode() : 0;
     }
 
     @Override
     public Category getCategory() {
         return Category.LIST;
+    }
+
+    @Override
+    public String toString() {
+        return "LIST<" + elementType + ">";
     }
 }

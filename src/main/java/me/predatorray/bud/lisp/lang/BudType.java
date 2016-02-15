@@ -13,12 +13,22 @@ public interface BudType {
         public Category getCategory() {
             return Category.PRIMITIVE;
         }
+
+        @Override
+        public String toString() {
+            return "BOOLEAN";
+        }
     };
 
     BudType NUMBER = new BudType() {
         @Override
         public Category getCategory() {
             return Category.PRIMITIVE;
+        }
+
+        @Override
+        public String toString() {
+            return "NUMBER";
         }
     };
 
@@ -27,6 +37,11 @@ public interface BudType {
         public Category getCategory() {
             return Category.PRIMITIVE;
         }
+
+        @Override
+        public String toString() {
+            return "STRING";
+        }
     };
 
     BudType SYMBOL = new BudType() {
@@ -34,12 +49,22 @@ public interface BudType {
         public Category getCategory() {
             return Category.OTHER;
         }
+
+        @Override
+        public String toString() {
+            return "SYMBOL";
+        }
     };
 
     BudType ENV = new BudType() {
         @Override
         public Category getCategory() {
             return Category.OTHER;
+        }
+
+        @Override
+        public String toString() {
+            return "ENV";
         }
     };
 }

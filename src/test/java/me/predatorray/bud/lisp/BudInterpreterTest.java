@@ -1,12 +1,15 @@
 package me.predatorray.bud.lisp;
 
+import me.predatorray.bud.lisp.lang.BudList;
 import me.predatorray.bud.lisp.lang.BudNumber;
+import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudString;
 import me.predatorray.bud.lisp.lang.Symbol;
 import me.predatorray.bud.lisp.test.AbstractInterpreterTest;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 public class BudInterpreterTest extends AbstractInterpreterTest {
 
@@ -48,5 +51,18 @@ public class BudInterpreterTest extends AbstractInterpreterTest {
     @Test
     public void testFactorial() throws Exception {
         assertInterpretCorrectly(new BudNumber(new BigDecimal(120)), "factorial.bud");
+    }
+
+    @Test
+    public void testSumOfNumberList() throws Exception {
+        assertInterpretCorrectly(new BudNumber(new BigDecimal(15)), "sum-of-number-list.bud");
+    }
+
+    @Test
+    public void testDoubleNumberList() throws Exception {
+        assertInterpretCorrectly(new BudList(null, Arrays.<BudObject>asList(
+                new BudNumber(new BigDecimal(2)),
+                new BudNumber(new BigDecimal(4)),
+                new BudNumber(new BigDecimal(6)))), "double-number-list.bud");
     }
 }

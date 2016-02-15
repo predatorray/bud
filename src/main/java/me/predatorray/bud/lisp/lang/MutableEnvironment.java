@@ -22,6 +22,6 @@ public class MutableEnvironment {
     }
 
     public Environment toEnvironment() {
-        return new Environment(bindings, enclosed, new Object());
+        return new Environment(bindings, enclosed, null);
     }
 }

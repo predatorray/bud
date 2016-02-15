@@ -29,6 +29,10 @@ public class BuiltinsEnvironment {
         initial.put("function?", new FunctionPredicate());
         initial.put("null?", new NullPredicate());
 
+        initial.put("car", new CarFunction());
+        initial.put("cdr", new CdrFunction());
+        initial.put("cons", new ConsFunction());
+
         initial.put("+", new AddFunction());
         initial.put("-", new SubtractFunction());
         initial.put("*", new MultiplyFunction());
@@ -41,6 +45,6 @@ public class BuiltinsEnvironment {
         initial.put("null-environment", new NullEnvironmentFunction());
         initial.put("builtins-environment", new BuiltinsEnvironmentFunction());
 
-        INSTANCE = Environment.toEnvironment(initial);
+        INSTANCE = Environment.toEnvironment(initial, "builtins");
     }
 }

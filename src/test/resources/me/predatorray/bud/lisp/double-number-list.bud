@@ -1,0 +1,7 @@
+((lambda (number-list)
+         (define (map fn list)
+                 (if (null? list)
+                     list
+                     (cons (fn (car list)) (map fn (cdr list)))))
+         (map (lambda (n) (+ n n)) number-list)) '(1 2 3)
+)
