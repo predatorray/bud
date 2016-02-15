@@ -71,7 +71,11 @@ public abstract class AbstractBudLispTest {
     }
 
     protected SymbolDatum newSymbolDatum(String symbol) {
-        return new SymbolDatum(new IdentifierToken(symbol, DUMMY_LOCATION));
+        return newSymbolDatum(symbol, DUMMY_LOCATION);
+    }
+
+    protected SymbolDatum newSymbolDatum(String symbol, TextLocation location) {
+        return new SymbolDatum(new IdentifierToken(symbol, location));
     }
 
     protected NumberDatum newNumberDatum(BigDecimal decimal) {
