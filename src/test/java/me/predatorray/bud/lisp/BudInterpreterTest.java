@@ -4,7 +4,6 @@ import me.predatorray.bud.lisp.lang.BudNumber;
 import me.predatorray.bud.lisp.lang.BudString;
 import me.predatorray.bud.lisp.lang.Symbol;
 import me.predatorray.bud.lisp.test.AbstractInterpreterTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -31,7 +30,6 @@ public class BudInterpreterTest extends AbstractInterpreterTest {
         assertInterpretCorrectly(new BudNumber(new BigDecimal(15)), "sum-one-to-five.bud");
     }
 
-    @Ignore("boolean tokens are currently not supported")
     @Test
     public void testLastSymbol() throws Exception {
         assertInterpretCorrectly(new Symbol("foobar"), "last-symbol.bud");

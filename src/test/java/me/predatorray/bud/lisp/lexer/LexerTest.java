@@ -56,4 +56,12 @@ public class LexerTest {
                 new IdentifierToken("xyz", new TextLocation(2, 11))),
                 "\n123 'abc  xyz");
     }
+
+    @Test
+    public void testLexer4() {
+        assertMatches(Arrays.asList(new BooleanToken(true, new TextLocation(1, 1)),
+                new Atmosphere(new TextLocation(1, 3)),
+                new BooleanToken(false, new TextLocation(1, 4))),
+                "#t #f");
+    }
 }

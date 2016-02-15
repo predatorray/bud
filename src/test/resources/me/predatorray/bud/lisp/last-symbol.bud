@@ -1,1 +1,1 @@
-(and #f #f 'foobar)
+(and #t #t 'foobar)

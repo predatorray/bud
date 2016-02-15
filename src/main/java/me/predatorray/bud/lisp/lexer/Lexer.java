@@ -39,6 +39,7 @@ class LexerIterator implements Iterator<Token> {
     private int[] doubleQuoteLocation = new int[2];
     private int[] symbolLocation = new int[2];
     private int[] numberLocation = new int[2];
+    private int[] boolOrCharLocation = new int[2];
 
     public LexerIterator(CharSequence source) {
         if (source == null) {
@@ -131,6 +132,20 @@ class LexerIterator implements Iterator<Token> {
                             }
                         }
                         break;
+                    case AFTER_SHARP:
+                        // TODO
+                        if (currChar == 't' || currChar == 'T') {
+                            state = TokenizerState.NORMAL;
+                            return new BooleanToken(true, getBoolOrCharLocation());
+                        }
+                        if (currChar == 'f' || currChar == 'F') {
+                            state = TokenizerState.NORMAL;
+                            return new BooleanToken(false, getBoolOrCharLocation());
+                        }
+                        if (currChar == '\\') {
+                            // TODO state = CHAR
+                        }
+                        throw new LexerException("not a valid character after #: " + currChar);
                     case NORMAL:
                     default:
                         if (isWhiteSpace(currChar)) {
@@ -162,6 +177,10 @@ class LexerIterator implements Iterator<Token> {
                             case '\"':
                                 doubleQuoteLocation = location.clone();
                                 state = TokenizerState.WITHIN_DOUBLE_QUOTES;
+                                break;
+                            case '#':
+                                boolOrCharLocation = location.clone();
+                                state = TokenizerState.AFTER_SHARP;
                                 break;
                             default:
                                 if (symbolValue.length() == 0) {
@@ -197,6 +216,10 @@ class LexerIterator implements Iterator<Token> {
 
     private TextLocation getCurrentNumberLocation() {
         return new TextLocation(numberLocation[0], numberLocation[1]);
+    }
+
+    private TextLocation getBoolOrCharLocation() {
+        return new TextLocation(boolOrCharLocation[0], boolOrCharLocation[1]);
     }
 
     public void remove() {
@@ -244,6 +267,8 @@ class LexerIterator implements Iterator<Token> {
     private static final Set<Character> PREFIXES_OF_NUMBER = Sets.union(NUMBERS, Sets.asSet('.'));
 
     /*
+     * state machine of string parsing:
+     *
      *            "                             \                       NEW_LINE
      * (NORMAL) =====> (WITHIN_DOUBLE_QUOTES) =====> (AFTER_BACKSLASH) ===========> (BACKSLASH_EOL)
      *
@@ -258,9 +283,21 @@ class LexerIterator implements Iterator<Token> {
      *
      *          <==================================================================
      *                                           "
+     *
+     * state machine of boolean/character parsing:
+     *
+     *            #                    \
+     * (NORMAL) =====> (AFTER_SHARP) =====> (CHAR)
+     *          <=====
+     *           [tf]
+     *
+     *          <==========================
+     *                    [CHAR]
      */
     private enum TokenizerState {
 
-        NORMAL, WITHIN_DOUBLE_QUOTES, AFTER_BACKSLASH, BACKSLASH_EOL, WITHIN_NUMBER
+        NORMAL,
+        WITHIN_DOUBLE_QUOTES, AFTER_BACKSLASH, BACKSLASH_EOL, WITHIN_NUMBER,
+        AFTER_SHARP
     }
 }
