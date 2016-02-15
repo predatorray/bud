@@ -31,7 +31,7 @@ public class BudInterpreterTest extends AbstractInterpreterTest {
         assertInterpretCorrectly(new BudNumber(new BigDecimal(15)), "sum-one-to-five.bud");
     }
 
-    @Ignore("single quote and boolean tokens are currently not supported")
+    @Ignore("boolean tokens are currently not supported")
     @Test
     public void testLastSymbol() throws Exception {
         assertInterpretCorrectly(new Symbol("foobar"), "last-symbol.bud");

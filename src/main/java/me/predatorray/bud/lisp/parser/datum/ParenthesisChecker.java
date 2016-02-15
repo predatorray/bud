@@ -3,6 +3,7 @@ package me.predatorray.bud.lisp.parser.datum;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.lexer.RightParenthesis;
 import me.predatorray.bud.lisp.lexer.TokenVisitorAdapter;
+import me.predatorray.bud.lisp.parser.ParserException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,9 @@ class ParenthesisChecker extends TokenVisitorAdapter {
 
     @Override
     public void visit(RightParenthesis rightParenthesis) {
+        if (leftParenthesisStack.isEmpty()) {
+            throw new ParserException("parentheses are not balanced");
+        }
         LeftParenthesis leftParenthesis = leftParenthesisStack.pop();
         parenthesisMap.put(rightParenthesis, leftParenthesis);
     }

@@ -314,9 +314,9 @@ public class CompoundDatum implements Datum {
                     }
                     List<Variable> formals = asFormalVariables(
                             variableAndFormals.subList(1, variableAndFormals.size()));
-                    definitions.add(new Definition(((Variable) variable), formals, body)); // TODO
+                    definitions.add(new Definition(((Variable) variable), formals, body));
                 } else if (defVariableDatum instanceof SymbolDatum) {
-                    Expression variable = ((SymbolDatum) defVariableDatum).getExpression();
+                    Expression variable = defVariableDatum.getExpression();
                     if (!(variable instanceof Variable)) {
                         malformedDefinitionInLambda();
                     }
