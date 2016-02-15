@@ -1,8 +1,15 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.evaluator.EvaluatingException;
+import me.predatorray.bud.lisp.lang.BudBoolean;
+import me.predatorray.bud.lisp.lang.BudObject;
+import me.predatorray.bud.lisp.lang.BudType;
+import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.Function;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ConditionSpecialForm extends CompoundExpression {
@@ -19,6 +26,37 @@ public class ConditionSpecialForm extends CompoundExpression {
     @Override
     public void accept(ExpressionVisitor expressionVisitor) {
         expressionVisitor.visit(this);
+    }
+
+    @Override
+    public BudObject evaluate(Environment environment) {
+        for (ConditionClause clause : clauses) {
+            Expression test = clause.getTest();
+            BudObject tested = test.evaluate(environment);
+            if (BudBoolean.FALSE.equals(tested)) {
+                continue;
+            }
+
+            if (clause.hasRecipient()) {
+                Expression recipient = clause.getRecipient();
+                BudObject recipientObj = recipient.evaluate(environment);
+                if (!BudType.Category.FUNCTION.equals(recipientObj.getType().getCategory())) {
+                    throw new NotApplicableException(recipient);
+                }
+                Function recipientFunction = (Function) recipientObj;
+                recipientFunction.inspect(Collections.singletonList(tested.getType()));
+                return recipientFunction.apply(Collections.singletonList(tested));
+            } else {
+                Expression consequent = clause.getConsequent();
+                return consequent.evaluate(environment);
+            }
+        }
+        if (elseExpression == null) {
+            throw new EvaluatingException("all clauses in cond are evaluated to false values and " +
+                    "no else-clause is found",
+                    this);
+        }
+        return elseExpression.evaluate(environment);
     }
 
     @Override

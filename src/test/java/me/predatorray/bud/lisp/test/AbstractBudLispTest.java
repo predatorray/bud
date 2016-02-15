@@ -4,6 +4,7 @@ import me.predatorray.bud.lisp.lexer.BooleanToken;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.lexer.NumberToken;
+import me.predatorray.bud.lisp.lexer.RightParenthesis;
 import me.predatorray.bud.lisp.lexer.StringToken;
 import me.predatorray.bud.lisp.lexer.TextLocation;
 import me.predatorray.bud.lisp.parser.BooleanLiteral;
@@ -16,6 +17,7 @@ import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.parser.datum.BooleanDatum;
 import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
 import me.predatorray.bud.lisp.parser.datum.Datum;
+import me.predatorray.bud.lisp.parser.datum.NumberDatum;
 import me.predatorray.bud.lisp.parser.datum.StringDatum;
 import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
 
@@ -26,6 +28,15 @@ public abstract class AbstractBudLispTest {
 
     protected final TextLocation DUMMY_LOCATION = new TextLocation(1, 1);
     protected final LeftParenthesis LP = new LeftParenthesis(DUMMY_LOCATION);
+    protected final RightParenthesis RP = new RightParenthesis(DUMMY_LOCATION);
+
+    protected LeftParenthesis lp(int column) {
+        return new LeftParenthesis(new TextLocation(1, column));
+    }
+
+    protected RightParenthesis rp(int column) {
+        return new RightParenthesis(new TextLocation(1, column));
+    }
 
     protected Variable newVariable(String variable) {
         return new Variable(new IdentifierToken(variable, DUMMY_LOCATION));
@@ -60,7 +71,19 @@ public abstract class AbstractBudLispTest {
     }
 
     protected SymbolDatum newSymbolDatum(String symbol) {
-        return new SymbolDatum(new IdentifierToken(symbol, DUMMY_LOCATION));
+        return newSymbolDatum(symbol, DUMMY_LOCATION);
+    }
+
+    protected SymbolDatum newSymbolDatum(String symbol, TextLocation location) {
+        return new SymbolDatum(new IdentifierToken(symbol, location));
+    }
+
+    protected NumberDatum newNumberDatum(BigDecimal decimal) {
+        return new NumberDatum(new NumberToken(decimal, DUMMY_LOCATION));
+    }
+
+    protected NumberDatum newNumberDatum(int i) {
+        return newNumberDatum(new BigDecimal(i));
     }
 
     protected StringDatum newStringDatum(String str) {
@@ -69,5 +92,9 @@ public abstract class AbstractBudLispTest {
 
     protected CompoundDatum newCompoundDatum(Datum ...data) {
         return new CompoundDatum(Arrays.asList(data), LP);
+    }
+
+    protected CompoundDatum newCompoundDatum(LeftParenthesis lp, Datum ...data) {
+        return new CompoundDatum(Arrays.asList(data), lp);
     }
 }

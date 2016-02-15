@@ -1,7 +1,6 @@
 package me.predatorray.bud.lisp.lang;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
-import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.parser.Definition;
 import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.LambdaExpression;
@@ -13,20 +12,19 @@ import java.util.Map;
 
 public class LambdaFunction implements Function {
 
-    private final FunctionType thisType;
+    private final FunctionType thisType = new FunctionType(this);
     private final List<Variable> formals;
     private final List<Definition> definitions;
     private final Expression body;
 
     private final LambdaExpression lambdaExpression;
-    private final Evaluator evaluator;
     private final Environment lexicalEnv;
+    private final Variable self;
 
-    public LambdaFunction(LambdaExpression lambdaExpression, Environment lexicalEnv, Evaluator evaluator) {
+    public LambdaFunction(LambdaExpression lambdaExpression, Environment lexicalEnv, Variable self) {
         this.lambdaExpression = lambdaExpression;
         this.lexicalEnv = lexicalEnv;
-        this.evaluator = evaluator;
-        thisType = new FunctionType(this);
+        this.self = self;
         this.formals = lambdaExpression.getFormals();
         this.definitions = lambdaExpression.getDefinitions();
         this.body = lambdaExpression.getBodyExpression();
@@ -46,23 +44,22 @@ public class LambdaFunction implements Function {
             throw new EvaluatingException(msg, lambdaExpression);
         }
 
-        Map<Variable, BudObject> argumentBindings = new HashMap<Variable, BudObject>(actualSize);
+        Map<Variable, BudObject> argumentBindings = new HashMap<>(actualSize);
         for (int i = 0; i < actualSize; i++) {
             Variable formal = formals.get(i);
             BudObject actual = arguments.get(i);
             argumentBindings.put(formal, actual);
-
         }
 
         MutableEnvironment envDefined = new MutableEnvironment(lexicalEnv);
+        if (self != null) {
+            envDefined.bind(self, this);
+        }
         for (Definition definition : definitions) {
-            Environment env = envDefined.toEnvironment();
-            Variable variable = definition.getVariable();
-            BudObject defined = evaluator.evaluate(definition.getExpression(), env);
-            envDefined.bind(variable, defined);
+            definition.bind(envDefined);
         }
         Environment enclosing = new Environment(argumentBindings, envDefined.toEnvironment());
-        return evaluator.evaluate(body, enclosing);
+        return body.evaluate(enclosing);
     }
 
     @Override
@@ -78,13 +75,15 @@ public class LambdaFunction implements Function {
         LambdaFunction that = (LambdaFunction) o;
 
         if (!lambdaExpression.equals(that.lambdaExpression)) return false;
-        return lexicalEnv.equals(that.lexicalEnv);
+        if (!lexicalEnv.equals(that.lexicalEnv)) return false;
+        return self != null ? self.equals(that.self) : that.self == null;
     }
 
     @Override
     public int hashCode() {
         int result = lambdaExpression.hashCode();
         result = 31 * result + lexicalEnv.hashCode();
+        result = 31 * result + (self != null ? self.hashCode() : 0);
         return result;
     }
 }

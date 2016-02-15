@@ -32,4 +32,22 @@ public class NumberToken implements Token {
     public BigDecimal getValue() {
         return decimal;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NumberToken that = (NumberToken) o;
+
+        if (!decimal.equals(that.decimal)) return false;
+        return location != null ? location.equals(that.location) : that.location == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = decimal.hashCode();
+        result = 31 * result + (location != null ? location.hashCode() : 0);
+        return result;
+    }
 }

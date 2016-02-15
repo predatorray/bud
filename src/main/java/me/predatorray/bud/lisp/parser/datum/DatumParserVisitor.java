@@ -7,10 +7,12 @@ import me.predatorray.bud.lisp.lexer.NumberToken;
 import me.predatorray.bud.lisp.lexer.RightParenthesis;
 import me.predatorray.bud.lisp.lexer.SingleQuoteToken;
 import me.predatorray.bud.lisp.lexer.StringToken;
+import me.predatorray.bud.lisp.lexer.TextLocation;
 import me.predatorray.bud.lisp.lexer.Token;
 import me.predatorray.bud.lisp.lexer.TokenVisitor;
 import me.predatorray.bud.lisp.parser.ParserException;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -18,6 +20,8 @@ import java.util.Stack;
 public class DatumParserVisitor implements TokenVisitor {
 
     private final ParenthesisChecker parenthesisChecker = new ParenthesisChecker();
+    private final SingleQuoteRecorder singleQuoteRecorder = new SingleQuoteRecorder();
+
     private final Stack<List<Datum>> dataStack;
 
     public DatumParserVisitor() {
@@ -28,51 +32,82 @@ public class DatumParserVisitor implements TokenVisitor {
     private void appendOnTopOfStack(Datum datum) {
         List<Datum> top = dataStack.peek();
         if (top == null) {
-            throw new ParserException(); // TODO
+            throw new ParserException("parentheses are not balanced");
         }
         top.add(datum);
+    }
+
+    private void appendOnTopOfStackQuoteIfRequired(Datum datum, Token token) {
+        SingleQuoteToken singleQuote = singleQuoteRecorder.getAndConsumeTheSingleQuotePrefix(token);
+        Datum each = datum;
+        while (singleQuote != null) {
+            each = quote(each, singleQuote);
+            singleQuote = singleQuoteRecorder.getAndConsumeTheSingleQuotePrefix(singleQuote);
+        }
+        appendOnTopOfStack(each);
+    }
+
+    private CompoundDatum quote(Datum datum, SingleQuoteToken singleQuote) {
+        TextLocation singleQuoteLocation = singleQuote.getLocation();
+        LeftParenthesis generatedLp = new LeftParenthesis(singleQuoteLocation);
+        return new CompoundDatum(Arrays.asList(
+                new SymbolDatum(new IdentifierToken("quote", singleQuoteLocation)),
+                datum), generatedLp);
     }
 
     @Override
     public void visit(LeftParenthesis leftParenthesis) {
         parenthesisChecker.visit(leftParenthesis);
+        singleQuoteRecorder.visit(leftParenthesis);
+
         dataStack.push(new LinkedList<Datum>());
     }
 
     @Override
     public void visit(RightParenthesis rightParenthesis) {
         parenthesisChecker.visit(rightParenthesis);
+        singleQuoteRecorder.visit(rightParenthesis);
+
+        SingleQuoteToken quotePrefixOfRp = singleQuoteRecorder.getAndConsumeTheSingleQuotePrefix(rightParenthesis);
+        if (quotePrefixOfRp != null) {
+            throw new ParserException("Cannot quote a right parenthesis", quotePrefixOfRp);
+        }
+
         LeftParenthesis leftParenthesis = parenthesisChecker.getLeftParenthesis(rightParenthesis);
 
         List<Datum> data = dataStack.pop();
         CompoundDatum compoundDatum = new CompoundDatum(data, leftParenthesis);
 
-        appendOnTopOfStack(compoundDatum);
+        appendOnTopOfStackQuoteIfRequired(compoundDatum, leftParenthesis);
     }
 
     @Override
     public void visit(SingleQuoteToken singleQuoteToken) {
-        // TODO
+        singleQuoteRecorder.visit(singleQuoteToken);
     }
 
     @Override
     public void visit(StringToken stringToken) {
-        appendOnTopOfStack(new StringDatum(stringToken));
+        singleQuoteRecorder.visit(stringToken);
+        appendOnTopOfStackQuoteIfRequired(new StringDatum(stringToken), stringToken);
     }
 
     @Override
     public void visit(BooleanToken booleanToken) {
-        appendOnTopOfStack(new BooleanDatum(booleanToken));
+        singleQuoteRecorder.visit(booleanToken);
+        appendOnTopOfStackQuoteIfRequired(new BooleanDatum(booleanToken), booleanToken);
     }
 
     @Override
     public void visit(NumberToken numberToken) {
-        appendOnTopOfStack(new NumberDatum(numberToken));
+        singleQuoteRecorder.visit(numberToken);
+        appendOnTopOfStackQuoteIfRequired(new NumberDatum(numberToken), numberToken);
     }
 
     @Override
     public void visit(IdentifierToken identifierToken) {
-        appendOnTopOfStack(new SymbolDatum(identifierToken));
+        singleQuoteRecorder.visit(identifierToken);
+        appendOnTopOfStackQuoteIfRequired(new SymbolDatum(identifierToken), identifierToken);
     }
 
     @Override

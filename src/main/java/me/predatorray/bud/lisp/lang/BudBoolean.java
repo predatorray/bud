@@ -22,4 +22,9 @@ public enum BudBoolean implements BudObject {
     public boolean isTrue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return value ? "#t" : "#f";
+    }
 }

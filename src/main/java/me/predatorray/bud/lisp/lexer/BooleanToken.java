@@ -25,6 +25,24 @@ public class BooleanToken implements Token {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BooleanToken that = (BooleanToken) o;
+
+        if (value != that.value) return false;
+        return location.equals(that.location);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (value ? 1 : 0);
+        result = 31 * result + location.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         return value ? "#t" : "#f";
     }

@@ -1,5 +1,8 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.lang.BudBoolean;
+import me.predatorray.bud.lisp.lang.BudObject;
+import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
@@ -17,6 +20,18 @@ public class OrSpecialForm extends CompoundExpression {
     @Override
     public void accept(ExpressionVisitor expressionVisitor) {
         expressionVisitor.visit(this);
+    }
+
+    @Override
+    public BudObject evaluate(Environment environment) {
+        BudObject eachTested = BudBoolean.FALSE;
+        for (Expression test : tests) {
+            eachTested = test.evaluate(environment);
+            if (!BudBoolean.FALSE.equals(eachTested)) {
+                return eachTested;
+            }
+        }
+        return eachTested;
     }
 
     public List<Expression> getTests() {

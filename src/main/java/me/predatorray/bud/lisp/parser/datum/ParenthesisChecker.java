@@ -1,27 +1,22 @@
 package me.predatorray.bud.lisp.parser.datum;
 
-import me.predatorray.bud.lisp.lexer.BooleanToken;
-import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
-import me.predatorray.bud.lisp.lexer.NumberToken;
 import me.predatorray.bud.lisp.lexer.RightParenthesis;
-import me.predatorray.bud.lisp.lexer.SingleQuoteToken;
-import me.predatorray.bud.lisp.lexer.StringToken;
-import me.predatorray.bud.lisp.lexer.Token;
-import me.predatorray.bud.lisp.lexer.TokenVisitor;
+import me.predatorray.bud.lisp.lexer.TokenVisitorAdapter;
+import me.predatorray.bud.lisp.parser.ParserException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-class ParenthesisChecker implements TokenVisitor {
+class ParenthesisChecker extends TokenVisitorAdapter {
 
     private final Stack<LeftParenthesis> leftParenthesisStack;
     private final Map<RightParenthesis, LeftParenthesis> parenthesisMap;
 
     public ParenthesisChecker() {
-        leftParenthesisStack = new Stack<LeftParenthesis>();
-        parenthesisMap = new HashMap<RightParenthesis, LeftParenthesis>();
+        leftParenthesisStack = new Stack<>();
+        parenthesisMap = new HashMap<>();
     }
 
     @Override
@@ -31,32 +26,11 @@ class ParenthesisChecker implements TokenVisitor {
 
     @Override
     public void visit(RightParenthesis rightParenthesis) {
+        if (leftParenthesisStack.isEmpty()) {
+            throw new ParserException("parentheses are not balanced");
+        }
         LeftParenthesis leftParenthesis = leftParenthesisStack.pop();
         parenthesisMap.put(rightParenthesis, leftParenthesis);
-    }
-
-    @Override
-    public void visit(SingleQuoteToken singleQuoteToken) {
-    }
-
-    @Override
-    public void visit(StringToken stringToken) {
-    }
-
-    @Override
-    public void visit(BooleanToken booleanToken) {
-    }
-
-    @Override
-    public void visit(NumberToken numberToken) {
-    }
-
-    @Override
-    public void visit(IdentifierToken identifierToken) {
-    }
-
-    @Override
-    public void visit(Token other) {
     }
 
     public LeftParenthesis getLeftParenthesis(RightParenthesis rightParenthesis) {
