@@ -14,6 +14,8 @@ public interface TokenVisitor {
 
     void visit(NumberToken numberToken);
 
+    void visit(CharacterToken characterToken);
+
     void visit(IdentifierToken identifierToken);
 
     void visit(Token other);

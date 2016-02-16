@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.parser.datum;
 
 import me.predatorray.bud.lisp.lexer.BooleanToken;
+import me.predatorray.bud.lisp.lexer.CharacterToken;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.lexer.NumberToken;
@@ -102,6 +103,12 @@ public class DatumParserVisitor implements TokenVisitor {
     public void visit(NumberToken numberToken) {
         singleQuoteRecorder.visit(numberToken);
         appendOnTopOfStackQuoteIfRequired(new NumberDatum(numberToken), numberToken);
+    }
+
+    @Override
+    public void visit(CharacterToken characterToken) {
+        singleQuoteRecorder.visit(characterToken);
+        appendOnTopOfStackQuoteIfRequired(new CharacterDatum(characterToken), characterToken);
     }
 
     @Override

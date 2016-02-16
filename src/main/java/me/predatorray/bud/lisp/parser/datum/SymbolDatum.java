@@ -5,12 +5,10 @@ import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.Keyword;
 import me.predatorray.bud.lisp.parser.Variable;
 
-public class SymbolDatum implements Datum {
-
-    private final IdentifierToken identifierToken;
+public class SymbolDatum extends SimpleDatum<IdentifierToken> {
 
     public SymbolDatum(IdentifierToken identifierToken) {
-        this.identifierToken = identifierToken;
+        super(identifierToken);
     }
 
     @Override
@@ -20,35 +18,15 @@ public class SymbolDatum implements Datum {
 
     @Override
     public Expression getExpression() {
-        Keyword keyword = Keyword.getKeywordIfApplicable(identifierToken);
+        Keyword keyword = Keyword.getKeywordIfApplicable(token);
         if (keyword == null) {
-            return new Variable(identifierToken);
+            return new Variable(token);
         } else {
             return keyword;
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        SymbolDatum that = (SymbolDatum) o;
-
-        return identifierToken.equals(that.identifierToken);
-    }
-
-    @Override
-    public int hashCode() {
-        return identifierToken.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return identifierToken.toString();
-    }
-
     public String getName() {
-        return identifierToken.getName();
+        return token.getName();
     }
 }

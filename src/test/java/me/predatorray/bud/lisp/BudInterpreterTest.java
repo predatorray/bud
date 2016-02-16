@@ -1,5 +1,6 @@
 package me.predatorray.bud.lisp;
 
+import me.predatorray.bud.lisp.lang.BudCharacter;
 import me.predatorray.bud.lisp.lang.BudList;
 import me.predatorray.bud.lisp.lang.BudNumber;
 import me.predatorray.bud.lisp.lang.BudObject;
@@ -16,6 +17,11 @@ public class BudInterpreterTest extends AbstractInterpreterTest {
     @Test
     public void testNumber1() throws Exception {
         assertInterpretCorrectly(new BudNumber(BigDecimal.ONE), "number1.bud");
+    }
+
+    @Test
+    public void testCharacterNewline() throws Exception {
+        assertInterpretCorrectly(new BudCharacter('\n'), "character-newline.bud");
     }
 
     @Test

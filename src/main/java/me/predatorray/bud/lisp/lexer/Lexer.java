@@ -4,8 +4,10 @@ import me.predatorray.bud.lisp.util.Sets;
 import me.predatorray.bud.lisp.util.StringEscapeUtils;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -34,6 +36,7 @@ class LexerIterator implements Iterator<Token> {
     private StringBuilder symbolValue = new StringBuilder();
     private StringBuilder doubleQuotedValue = new StringBuilder();
     private StringBuilder numberValue = new StringBuilder();
+    private StringBuilder charValue = new StringBuilder();
 
     private int[] location = new int[] {1, 0};
     private int[] doubleQuoteLocation = new int[2];
@@ -121,7 +124,7 @@ class LexerIterator implements Iterator<Token> {
                         }
                     case WITHIN_NUMBER:
                         numberValue.append(currChar);
-                        if (isEndOfSymbolOrNumber()) {
+                        if (isEndOfSymbolOrNumberOrChar()) {
                             String number = popNumberValue();
                             state = TokenizerState.NORMAL;
                             try {
@@ -143,9 +146,29 @@ class LexerIterator implements Iterator<Token> {
                             return new BooleanToken(false, getBoolOrCharLocation());
                         }
                         if (currChar == '\\') {
-                            // TODO state = CHAR
+                            state = TokenizerState.CHAR;
+                            break;
                         }
                         throw new LexerException("not a valid character after #: " + currChar);
+                    case CHAR:
+                        charValue.append(currChar);
+                        if (isEndOfSymbolOrNumberOrChar()) {
+                            state = TokenizerState.NORMAL;
+                            String charOrCharName = popCharValue();
+                            if (charOrCharName.isEmpty()) {
+                                throw new LexerException("More characters after backslash are expected, " +
+                                        "but EOF has been reached.");
+                            } else if (charOrCharName.length() == 1) {
+                                return new CharacterToken(charOrCharName.charAt(0), getBoolOrCharLocation());
+                            } else {
+                                String charName = charOrCharName.toLowerCase();
+                                Character c = CHAR_NAME_MAP.get(charName);
+                                if (c == null) {
+                                    throw new LexerException("Could not find a character named: " + charName);
+                                }
+                                return new CharacterToken(c, getBoolOrCharLocation());
+                            }
+                        }
                     case NORMAL:
                     default:
                         if (isWhiteSpace(currChar)) {
@@ -155,7 +178,7 @@ class LexerIterator implements Iterator<Token> {
                             numberValue.append(currChar);
                             state = TokenizerState.WITHIN_NUMBER;
                             numberLocation = location.clone();
-                            if (isEndOfSymbolOrNumber()) {
+                            if (isEndOfSymbolOrNumberOrChar()) {
                                 String number = popNumberValue();
                                 state = TokenizerState.NORMAL;
                                 try {
@@ -187,7 +210,7 @@ class LexerIterator implements Iterator<Token> {
                                     symbolLocation = location.clone();
                                 }
                                 symbolValue.append(currChar);
-                                if (isEndOfSymbolOrNumber()) {
+                                if (isEndOfSymbolOrNumberOrChar()) {
                                     return new IdentifierToken(popSymbolValue(), getCurrentSymbolLocation());
                                 }
                         }
@@ -244,6 +267,12 @@ class LexerIterator implements Iterator<Token> {
         return number;
     }
 
+    private String popCharValue() {
+        String charOrCharName = charValue.toString();
+        charValue.setLength(0);
+        return charOrCharName;
+    }
+
     private static final Set<Character> WHITESPACES = Sets.asSet(' ', '\n', '\t', '\r');
 
     private boolean isWhiteSpace(char c) {
@@ -252,7 +281,7 @@ class LexerIterator implements Iterator<Token> {
 
     private static final Set<Character> DELIMITERS = Sets.union(WHITESPACES, Sets.asSet('(', ')', '"', ';'));
 
-    private boolean isEndOfSymbolOrNumber() {
+    private boolean isEndOfSymbolOrNumberOrChar() {
         int nextIndex = currIndex + 1;
         return (nextIndex >= source.length()) || DELIMITERS.contains(source.charAt(nextIndex));
     }
@@ -265,6 +294,18 @@ class LexerIterator implements Iterator<Token> {
     }
 
     private static final Set<Character> PREFIXES_OF_NUMBER = Sets.union(NUMBERS, Sets.asSet('.'));
+
+    private static final Map<String, Character> CHAR_NAME_MAP = new HashMap<>();
+    static {
+        CHAR_NAME_MAP.put("bs", '\b');
+        CHAR_NAME_MAP.put("tab", '\t');
+        CHAR_NAME_MAP.put("cr", '\r');
+        CHAR_NAME_MAP.put("newline", '\n');
+        CHAR_NAME_MAP.put("space", ' ');
+        for (int i = 0; i <= 32; i++) {
+            CHAR_NAME_MAP.put(String.format("%03o", i), (char) i);
+        }
+    }
 
     /*
      * state machine of string parsing:
@@ -298,6 +339,6 @@ class LexerIterator implements Iterator<Token> {
 
         NORMAL,
         WITHIN_DOUBLE_QUOTES, AFTER_BACKSLASH, BACKSLASH_EOL, WITHIN_NUMBER,
-        AFTER_SHARP
+        AFTER_SHARP, CHAR
     }
 }

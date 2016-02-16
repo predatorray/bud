@@ -32,6 +32,18 @@ public interface BudType {
         }
     };
 
+    BudType CHARACTER = new BudType() {
+        @Override
+        public Category getCategory() {
+            return Category.PRIMITIVE;
+        }
+
+        @Override
+        public String toString() {
+            return "CHARACTER";
+        }
+    };
+
     BudType STRING = new BudType() {
         @Override
         public Category getCategory() {

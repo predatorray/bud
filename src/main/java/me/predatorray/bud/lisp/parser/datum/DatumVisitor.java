@@ -8,6 +8,8 @@ public interface DatumVisitor {
 
     void visit(StringDatum stringDatum);
 
+    void visit(CharacterDatum characterDatum);
+
     void visit(SymbolDatum symbolDatum);
 
     void visit(CompoundDatum compoundDatum);

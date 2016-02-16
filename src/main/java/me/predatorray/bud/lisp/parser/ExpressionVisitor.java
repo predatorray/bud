@@ -8,6 +8,8 @@ public interface ExpressionVisitor {
 
     void visit(StringLiteral stringLiteral);
 
+    void visit(CharacterLiteral characterLiteral);
+
     void visit(Variable variable);
 
     void visit(Keyword keyword);

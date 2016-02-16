@@ -32,13 +32,13 @@ public class BooleanToken implements Token {
         BooleanToken that = (BooleanToken) o;
 
         if (value != that.value) return false;
-        return location.equals(that.location);
+        return location != null ? location.equals(that.location) : that.location == null;
     }
 
     @Override
     public int hashCode() {
         int result = (value ? 1 : 0);
-        result = 31 * result + location.hashCode();
+        result = 31 * result + (location != null ? location.hashCode() : 0);
         return result;
     }
 

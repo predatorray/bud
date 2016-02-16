@@ -19,4 +19,19 @@ abstract class ConstantToken implements Token {
     public String toString() {
         return textForm;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ConstantToken that = (ConstantToken) o;
+
+        return location != null ? location.equals(that.location) : that.location == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return location != null ? location.hashCode() : 0;
+    }
 }

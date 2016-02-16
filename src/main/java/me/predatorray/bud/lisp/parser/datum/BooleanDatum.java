@@ -4,12 +4,10 @@ import me.predatorray.bud.lisp.lexer.BooleanToken;
 import me.predatorray.bud.lisp.parser.BooleanLiteral;
 import me.predatorray.bud.lisp.parser.Expression;
 
-public class BooleanDatum implements Datum {
-
-    private final BooleanToken booleanToken;
+public class BooleanDatum extends SimpleDatum<BooleanToken> {
 
     public BooleanDatum(BooleanToken booleanToken) {
-        this.booleanToken = booleanToken;
+        super(booleanToken);
     }
 
     @Override
@@ -19,31 +17,10 @@ public class BooleanDatum implements Datum {
 
     @Override
     public Expression getExpression() {
-        return new BooleanLiteral(booleanToken);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BooleanDatum that = (BooleanDatum) o;
-
-        return booleanToken.equals(that.booleanToken);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return booleanToken.hashCode();
+        return new BooleanLiteral(token);
     }
 
     public boolean getValue() {
-        return booleanToken.getValue();
-    }
-
-    @Override
-    public String toString() {
-        return booleanToken.toString();
+        return token.getValue();
     }
 }

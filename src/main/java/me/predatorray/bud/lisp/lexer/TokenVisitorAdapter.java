@@ -33,6 +33,11 @@ public class TokenVisitorAdapter implements TokenVisitor {
     }
 
     @Override
+    public void visit(CharacterToken characterToken) {
+        visitDefault(characterToken);
+    }
+
+    @Override
     public void visit(IdentifierToken identifierToken) {
         visitDefault(identifierToken);
     }

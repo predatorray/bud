@@ -4,12 +4,10 @@ import me.predatorray.bud.lisp.lexer.StringToken;
 import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.StringLiteral;
 
-public class StringDatum implements Datum {
-
-    private final StringToken stringToken;
+public class StringDatum extends SimpleDatum<StringToken> {
 
     public StringDatum(StringToken stringToken) {
-        this.stringToken = stringToken;
+        super(stringToken);
     }
 
     @Override
@@ -18,32 +16,11 @@ public class StringDatum implements Datum {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        StringDatum that = (StringDatum) o;
-
-        return stringToken.equals(that.stringToken);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return stringToken.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return stringToken.toString();
-    }
-
-    @Override
     public Expression getExpression() {
-        return new StringLiteral(stringToken);
+        return new StringLiteral(token);
     }
 
     public String getValue() {
-        return stringToken.getStringValue();
+        return token.getStringValue();
     }
 }
