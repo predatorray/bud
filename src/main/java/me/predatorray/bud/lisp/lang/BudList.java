@@ -3,12 +3,9 @@ package me.predatorray.bud.lisp.lang;
 import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class BudList implements BudObject {
-
-    public static final BudList EMPTY_LIST = new BudList(null, Collections.<BudObject>emptyList());
 
     private final BudType elementType;
     private final List<BudObject> elements;
@@ -30,6 +27,10 @@ public class BudList implements BudObject {
 
     public List<BudObject> getElements() {
         return elements;
+    }
+
+    public boolean isNull() {
+        return size == 0;
     }
 
     @Override

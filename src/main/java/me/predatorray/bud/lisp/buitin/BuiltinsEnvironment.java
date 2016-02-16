@@ -45,6 +45,8 @@ public class BuiltinsEnvironment {
         initial.put("null-environment", new NullEnvironmentFunction());
         initial.put("builtins-environment", new BuiltinsEnvironmentFunction());
 
+        initial.put("list->typed-list", new ConvertListElementTypeFunction());
+
         INSTANCE = Environment.toEnvironment(initial, "builtins");
     }
 }

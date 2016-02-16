@@ -5,7 +5,7 @@ public interface BudType {
     Category getCategory();
 
     enum Category {
-        PRIMITIVE, LIST, FUNCTION, OTHER
+        PRIMITIVE, SYMBOL, ENV, LIST, FUNCTION, OTHER
     }
 
     BudType BOOLEAN = new BudType() {
@@ -59,7 +59,7 @@ public interface BudType {
     BudType SYMBOL = new BudType() {
         @Override
         public Category getCategory() {
-            return Category.OTHER;
+            return Category.SYMBOL;
         }
 
         @Override
@@ -71,7 +71,7 @@ public interface BudType {
     BudType ENV = new BudType() {
         @Override
         public Category getCategory() {
-            return Category.OTHER;
+            return Category.ENV;
         }
 
         @Override

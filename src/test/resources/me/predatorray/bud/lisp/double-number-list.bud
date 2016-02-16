@@ -3,5 +3,5 @@
                  (if (null? list)
                      list
                      (cons (fn (car list)) (map fn (cdr list)))))
-         (map (lambda (n) (+ n n)) number-list)) '(1 2 3)
+         (map (lambda (n) (+ n n)) number-list)) (list->typed-list '(1 2 3) 'number)
 )

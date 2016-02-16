@@ -5,6 +5,7 @@ import me.predatorray.bud.lisp.lang.BudList;
 import me.predatorray.bud.lisp.lang.BudNumber;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudString;
+import me.predatorray.bud.lisp.lang.BudType;
 import me.predatorray.bud.lisp.lang.Symbol;
 import me.predatorray.bud.lisp.test.AbstractInterpreterTest;
 import org.junit.Test;
@@ -66,7 +67,7 @@ public class BudInterpreterTest extends AbstractInterpreterTest {
 
     @Test
     public void testDoubleNumberList() throws Exception {
-        assertInterpretCorrectly(new BudList(null, Arrays.<BudObject>asList(
+        assertInterpretCorrectly(new BudList(BudType.NUMBER, Arrays.<BudObject>asList(
                 new BudNumber(new BigDecimal(2)),
                 new BudNumber(new BigDecimal(4)),
                 new BudNumber(new BigDecimal(6)))), "double-number-list.bud");
