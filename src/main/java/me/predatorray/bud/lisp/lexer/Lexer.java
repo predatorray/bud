@@ -136,7 +136,6 @@ class LexerIterator implements Iterator<Token> {
                         }
                         break;
                     case AFTER_SHARP:
-                        // TODO
                         if (currChar == 't' || currChar == 'T') {
                             state = TokenizerState.NORMAL;
                             return new BooleanToken(true, getBoolOrCharLocation());
