@@ -8,6 +8,7 @@ import java.util.Set;
 
 public class Sets {
 
+    @SafeVarargs
     public static <T> Set<T> asSet(T ...ts) {
         Validation.notNull(ts, "sets must not be null");
         return Collections.unmodifiableSet(new HashSet<T>(Arrays.asList(ts)));

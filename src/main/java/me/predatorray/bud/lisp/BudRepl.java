@@ -32,9 +32,13 @@ public class BudRepl {
     private final boolean interactive;
 
     public BudRepl() {
+        this(true);
+    }
+
+    public BudRepl(boolean interactive) {
         this.evaluator = new NaiveEvaluator();
         this.initial = BuiltinsEnvironment.INSTANCE;
-        this.interactive = true;
+        this.interactive = interactive;
     }
 
     private class ReplParserCallback implements Parser.ParserCallback {
@@ -74,6 +78,9 @@ public class BudRepl {
 
         boolean exceptionOccurred = false;
         while (true) {
+            if (exceptionOccurred) {
+                parser = new Parser(replParserCallback);
+            }
             try {
                 if (interactive) {
                     if (replParserCallback.hasAnyExpressionBeenEvaluated() || exceptionOccurred) {
@@ -89,7 +96,6 @@ public class BudRepl {
                     break;
                 }
 
-                // TODO if ended with backslash
                 Lexer lexer = new Lexer(line);
                 Iterator<Token> tokenIterator = lexer.iterator();
                 parser.feed(tokenIterator);
