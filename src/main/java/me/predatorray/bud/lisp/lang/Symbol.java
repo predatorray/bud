@@ -33,4 +33,9 @@ public class Symbol implements BudObject {
     public int hashCode() {
         return name.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

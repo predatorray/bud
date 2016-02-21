@@ -1,0 +1,3 @@
+*.java  eol=crlf
+*.xml   eol=crlf
+*.bud   eol=crlf

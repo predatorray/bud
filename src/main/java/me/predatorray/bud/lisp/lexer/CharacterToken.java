@@ -1,14 +1,12 @@
 package me.predatorray.bud.lisp.lexer;
 
-import me.predatorray.bud.lisp.util.Validation;
+public class CharacterToken implements Token {
 
-public class IdentifierToken implements Token {
-
-    private final String name;
+    private final char c;
     private final TextLocation location;
 
-    public IdentifierToken(String name, TextLocation location) {
-        this.name = Validation.notNull(name, "the name of an identifier must not be null");
+    public CharacterToken(char c, TextLocation location) {
+        this.c = c;
         this.location = location;
     }
 
@@ -22,13 +20,8 @@ public class IdentifierToken implements Token {
         visitor.visit(this);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    public char getValue() {
+        return c;
     }
 
     @Override
@@ -36,16 +29,21 @@ public class IdentifierToken implements Token {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        IdentifierToken that = (IdentifierToken) o;
+        CharacterToken that = (CharacterToken) o;
 
-        if (!name.equals(that.name)) return false;
+        if (c != that.c) return false;
         return location != null ? location.equals(that.location) : that.location == null;
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
+        int result = (int) c;
         result = 31 * result + (location != null ? location.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "#\\" + c; // TODO escape
     }
 }

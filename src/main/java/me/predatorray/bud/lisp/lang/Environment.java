@@ -10,6 +10,7 @@ public class Environment implements BudObject {
 
     private final Environment enclosed;
     private final Map<String, BudObject> bindings;
+    private final String name;
 
     public Environment() {
         this(Collections.<Variable, BudObject>emptyMap(), null);
@@ -20,16 +21,17 @@ public class Environment implements BudObject {
     }
 
     public Environment(Map<Variable, BudObject> bindings, Environment enclosed) {
-        this(toStringMap(bindings), enclosed, new Object());
+        this(toStringMap(bindings), enclosed, null);
     }
 
-    Environment(Map<String, BudObject> bindings, Environment enclosed, Object dummy) {
+    Environment(Map<String, BudObject> bindings, Environment enclosed, String name) {
         if (bindings == null) {
             this.bindings = Collections.emptyMap();
         } else {
             this.bindings = Collections.unmodifiableMap(bindings);
         }
         this.enclosed = enclosed;
+        this.name = name;
     }
 
     public BudObject lookup(Variable variable) {
@@ -48,8 +50,8 @@ public class Environment implements BudObject {
         return BudType.ENV;
     }
 
-    public static Environment toEnvironment(Map<String, BudObject> bindings) {
-        return new Environment(bindings, null, new Object());
+    public static Environment toEnvironment(Map<String, BudObject> bindings, String name) {
+        return new Environment(bindings, null, name);
     }
 
     private static Map<String, BudObject> toStringMap(Map<Variable, BudObject> bindings) {
@@ -58,5 +60,10 @@ public class Environment implements BudObject {
             stringMap.put(entry.getKey().getVariableName(), entry.getValue());
         }
         return stringMap;
+    }
+
+    @Override
+    public String toString() {
+        return name == null ? "ENV@" + Integer.toHexString(hashCode()) : name;
     }
 }

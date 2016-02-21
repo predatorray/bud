@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.parser.datum;
 
 import me.predatorray.bud.lisp.lexer.BooleanToken;
+import me.predatorray.bud.lisp.lexer.CharacterToken;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.lexer.NumberToken;
@@ -12,6 +13,7 @@ import me.predatorray.bud.lisp.lexer.Token;
 import me.predatorray.bud.lisp.lexer.TokenVisitor;
 import me.predatorray.bud.lisp.parser.ParserException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,10 +25,12 @@ public class DatumParserVisitor implements TokenVisitor {
     private final SingleQuoteRecorder singleQuoteRecorder = new SingleQuoteRecorder();
 
     private final Stack<List<Datum>> dataStack;
+    private final List<Datum> bottom;
 
     public DatumParserVisitor() {
         dataStack = new Stack<>();
-        dataStack.push(new LinkedList<Datum>());
+        bottom = new LinkedList<>();
+        dataStack.push(bottom);
     }
 
     private void appendOnTopOfStack(Datum datum) {
@@ -35,6 +39,13 @@ public class DatumParserVisitor implements TokenVisitor {
             throw new ParserException("parentheses are not balanced");
         }
         top.add(datum);
+        if (top == bottom) {
+            rootDatumReady(datum);
+        }
+    }
+
+    protected void rootDatumReady(Datum datumAtStackBottom) {
+        // does nothing
     }
 
     private void appendOnTopOfStackQuoteIfRequired(Datum datum, Token token) {
@@ -105,6 +116,12 @@ public class DatumParserVisitor implements TokenVisitor {
     }
 
     @Override
+    public void visit(CharacterToken characterToken) {
+        singleQuoteRecorder.visit(characterToken);
+        appendOnTopOfStackQuoteIfRequired(new CharacterDatum(characterToken), characterToken);
+    }
+
+    @Override
     public void visit(IdentifierToken identifierToken) {
         singleQuoteRecorder.visit(identifierToken);
         appendOnTopOfStackQuoteIfRequired(new SymbolDatum(identifierToken), identifierToken);
@@ -119,6 +136,6 @@ public class DatumParserVisitor implements TokenVisitor {
         if (!parenthesisChecker.isBalanced()) {
             throw new ParserException("parentheses are not balanced");
         }
-        return dataStack.peek();
+        return new ArrayList<>(bottom);
     }
 }

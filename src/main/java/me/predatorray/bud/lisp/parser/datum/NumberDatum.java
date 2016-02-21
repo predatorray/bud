@@ -6,12 +6,10 @@ import me.predatorray.bud.lisp.parser.NumberLiteral;
 
 import java.math.BigDecimal;
 
-public class NumberDatum implements Datum {
-
-    private final NumberToken numberToken;
+public class NumberDatum extends SimpleDatum<NumberToken> {
 
     public NumberDatum(NumberToken numberToken) {
-        this.numberToken = numberToken;
+        super(numberToken);
     }
 
     @Override
@@ -20,31 +18,11 @@ public class NumberDatum implements Datum {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        NumberDatum that = (NumberDatum) o;
-
-        return numberToken.equals(that.numberToken);
-    }
-
-    @Override
-    public int hashCode() {
-        return numberToken.hashCode();
-    }
-
-    @Override
     public Expression getExpression() {
-        return new NumberLiteral(numberToken);
+        return new NumberLiteral(token);
     }
 
     public BigDecimal getValue() {
-        return numberToken.getValue();
-    }
-
-    @Override
-    public String toString() {
-        return numberToken.toString();
+        return token.getValue();
     }
 }

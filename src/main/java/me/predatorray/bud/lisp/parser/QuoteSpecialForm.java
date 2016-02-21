@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.lang.BudBoolean;
+import me.predatorray.bud.lisp.lang.BudCharacter;
 import me.predatorray.bud.lisp.lang.BudList;
 import me.predatorray.bud.lisp.lang.BudNumber;
 import me.predatorray.bud.lisp.lang.BudObject;
@@ -9,6 +10,7 @@ import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Symbol;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.parser.datum.BooleanDatum;
+import me.predatorray.bud.lisp.parser.datum.CharacterDatum;
 import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
 import me.predatorray.bud.lisp.parser.datum.Datum;
 import me.predatorray.bud.lisp.parser.datum.DatumVisitor;
@@ -82,6 +84,11 @@ public class QuoteSpecialForm extends TokenLocatedExpression {
         @Override
         public void visit(StringDatum stringDatum) {
             datumObject = new BudString(stringDatum.getValue());
+        }
+
+        @Override
+        public void visit(CharacterDatum characterDatum) {
+            datumObject = new BudCharacter(characterDatum.getValue());
         }
 
         @Override

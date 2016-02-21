@@ -1,0 +1,7 @@
+((lambda (number-list)
+         (define (reduce fn list initial)
+                 (if (equals? list '())
+                     initial
+                     (reduce fn (cdr list) (fn (car list) initial))))
+         (reduce (lambda (mem n) (+ mem n)) number-list 0)) '(1 2 3 4 5)
+)

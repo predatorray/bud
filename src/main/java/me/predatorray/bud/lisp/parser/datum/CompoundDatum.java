@@ -3,6 +3,7 @@ package me.predatorray.bud.lisp.parser.datum;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.parser.AndSpecialForm;
 import me.predatorray.bud.lisp.parser.BooleanLiteral;
+import me.predatorray.bud.lisp.parser.CharacterLiteral;
 import me.predatorray.bud.lisp.parser.ConditionClause;
 import me.predatorray.bud.lisp.parser.ConditionSpecialForm;
 import me.predatorray.bud.lisp.parser.Definition;
@@ -108,6 +109,11 @@ public class CompoundDatum implements Datum {
         @Override
         public void visit(StringLiteral stringLiteral) {
             throw new NotApplicableException(stringLiteral);
+        }
+
+        @Override
+        public void visit(CharacterLiteral characterLiteral) {
+            throw new NotApplicableException(characterLiteral);
         }
 
         @Override

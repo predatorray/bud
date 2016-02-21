@@ -1,5 +1,6 @@
 package me.predatorray.bud.lisp.lang;
 
+import me.predatorray.bud.lisp.util.StringUtils;
 import me.predatorray.bud.lisp.util.Validation;
 
 public class BudString implements BudObject {
@@ -36,6 +37,6 @@ public class BudString implements BudObject {
 
     @Override
     public String toString() {
-        return value;
+        return StringUtils.quote(value);
     }
 }

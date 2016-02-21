@@ -21,7 +21,12 @@ public class NullPredicate extends Predicate {
 
     @Override
     protected boolean predicate(List<BudObject> arguments) {
-        return BudList.EMPTY_LIST.equals(arguments.get(0));
+        BudObject argument = arguments.get(0);
+        if (!BudType.Category.LIST.equals(argument.getType().getCategory())) {
+            return false;
+        }
+        BudList list = (BudList) argument;
+        return list.isNull();
     }
 
     @Override
