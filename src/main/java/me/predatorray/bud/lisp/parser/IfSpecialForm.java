@@ -1,5 +1,6 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.BudBoolean;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
@@ -25,12 +26,12 @@ public class IfSpecialForm extends CompoundExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment) {
-        BudObject tested = test.evaluate(environment);
+    public BudObject evaluate(Environment environment, Evaluator evaluator) {
+        BudObject tested = evaluator.evaluate(test, environment);
         if (!BudBoolean.FALSE.equals(tested)) { // any object not #f is treated as true
-            return consequent.evaluate(environment);
+            return evaluator.evaluate(consequent, environment);
         } else {
-            return alternate.evaluate(environment);
+            return evaluator.evaluate(alternate, environment);
         }
     }
 

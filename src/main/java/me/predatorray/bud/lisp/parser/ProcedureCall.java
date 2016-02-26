@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
+import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
 import me.predatorray.bud.lisp.lang.Environment;
@@ -27,8 +28,8 @@ public class ProcedureCall extends CompoundExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment) {
-        BudObject applicable = operator.evaluate(environment);
+    public BudObject evaluate(Environment environment, Evaluator evaluator) {
+        BudObject applicable = evaluator.evaluate(operator, environment);
         if (!BudType.Category.FUNCTION.equals(applicable.getType().getCategory())) {
             throw new EvaluatingException("not applicable", operator);
         }
@@ -37,7 +38,7 @@ public class ProcedureCall extends CompoundExpression {
         List<BudType> argTypes = new ArrayList<>(operands.size());
         List<BudObject> arguments = new ArrayList<>(operands.size());
         for (Expression operand : operands) {
-            BudObject arg = operand.evaluate(environment);
+            BudObject arg = evaluator.evaluate(operand, environment);
             argTypes.add(arg.getType());
             arguments.add(arg);
         }

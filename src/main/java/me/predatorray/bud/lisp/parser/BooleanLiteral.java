@@ -1,5 +1,6 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.BudBoolean;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
@@ -20,7 +21,7 @@ public class BooleanLiteral extends TokenLocatedExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment) {
+    public BudObject evaluate(Environment environment, Evaluator evaluator) {
         return BudBoolean.valueOf(value);
     }
 

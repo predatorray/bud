@@ -1,5 +1,6 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.MutableEnvironment;
 import me.predatorray.bud.lisp.util.StringUtils;
 import me.predatorray.bud.lisp.util.Validation;
@@ -25,15 +26,15 @@ public class Definition {
         this.formals = Validation.notNull(formals);
     }
 
-    public void bind(MutableEnvironment environment) {
+    public void bind(MutableEnvironment environment, Evaluator evaluator) {
         if (formals == null) {
             // normal definition
-            environment.bind(variable, expression.evaluate(environment.toEnvironment()));
+            environment.bind(variable, evaluator.evaluate(expression, environment.toEnvironment()));
         } else {
             // named lambda definition
             LambdaExpression lambdaExpression = new LambdaExpression(formals, Collections.<Definition>emptyList(),
                     expression, variable, expression);
-            environment.bind(variable, lambdaExpression.evaluate(environment.toEnvironment()));
+            environment.bind(variable, evaluator.evaluate(lambdaExpression, environment.toEnvironment()));
         }
     }
 

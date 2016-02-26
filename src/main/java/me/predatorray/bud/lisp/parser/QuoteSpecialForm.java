@@ -1,5 +1,6 @@
 package me.predatorray.bud.lisp.parser;
 
+import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.BudBoolean;
 import me.predatorray.bud.lisp.lang.BudCharacter;
 import me.predatorray.bud.lisp.lang.BudList;
@@ -37,7 +38,7 @@ public class QuoteSpecialForm extends TokenLocatedExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment) {
+    public BudObject evaluate(Environment environment, Evaluator evaluator) {
         DatumObjectConstructor constructor = new DatumObjectConstructor();
         quotedDatum.accept(constructor);
         return constructor.datumObject;

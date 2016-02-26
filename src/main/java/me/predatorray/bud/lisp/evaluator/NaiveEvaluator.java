@@ -8,6 +8,6 @@ public class NaiveEvaluator implements Evaluator {
 
     @Override
     public BudObject evaluate(Expression expression, Environment environment) {
-        return expression.evaluate(environment);
+        return expression.evaluate(environment, this);
     }
 }
