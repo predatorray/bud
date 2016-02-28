@@ -11,4 +11,8 @@ public class EvaluatingException extends RuntimeException {
     public EvaluatingException(String message, Expression expression) {
         super(message + ": " + expression + " at " + expression.getLocation());
     }
+
+    public EvaluatingException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

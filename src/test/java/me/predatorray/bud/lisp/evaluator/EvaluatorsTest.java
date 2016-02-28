@@ -21,9 +21,12 @@ import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
 import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.test.AbstractBudLispTest;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
@@ -33,10 +36,21 @@ import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-public class NaiveEvaluatorTest extends AbstractBudLispTest {
+@RunWith(Parameterized.class)
+public class EvaluatorsTest extends AbstractBudLispTest {
 
-    private final NaiveEvaluator sut = new NaiveEvaluator();
     private final Environment EMPTY_ENV = new Environment();
+
+    @Parameterized.Parameter(0)
+    public Evaluator sut;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(
+                new Object[] {new NaiveEvaluator()},
+                new Object[] {new ConcurrentEvaluator()}
+        );
+    }
 
     @Test
     public void testEvaluateString() throws Exception {

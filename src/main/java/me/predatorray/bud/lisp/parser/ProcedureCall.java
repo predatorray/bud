@@ -7,6 +7,7 @@ import me.predatorray.bud.lisp.lang.BudType;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Function;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
+import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +31,27 @@ public class ProcedureCall extends CompoundExpression {
     @Override
     public BudObject evaluate(Environment environment, Evaluator evaluator) {
         BudObject applicable = evaluator.evaluate(operator, environment);
-        if (!BudType.Category.FUNCTION.equals(applicable.getType().getCategory())) {
-            throw new EvaluatingException("not applicable", operator);
-        }
-        Function function = (Function) applicable;
-
-        List<BudType> argTypes = new ArrayList<>(operands.size());
         List<BudObject> arguments = new ArrayList<>(operands.size());
         for (Expression operand : operands) {
             BudObject arg = evaluator.evaluate(operand, environment);
-            argTypes.add(arg.getType());
             arguments.add(arg);
+        }
+
+        return apply(applicable, arguments);
+    }
+
+    public static BudObject apply(BudObject applicable, List<BudObject> arguments) {
+        Validation.notNull(applicable);
+        Validation.notNull(arguments);
+
+        if (!BudType.Category.FUNCTION.equals(applicable.getType().getCategory())) {
+            throw new EvaluatingException(applicable + " is not applicable");
+        }
+        Function function = (Function) applicable;
+
+        List<BudType> argTypes = new ArrayList<>(arguments.size());
+        for (BudObject argument : arguments) {
+            argTypes.add(argument.getType());
         }
         function.inspect(argTypes);
         return function.apply(arguments);
