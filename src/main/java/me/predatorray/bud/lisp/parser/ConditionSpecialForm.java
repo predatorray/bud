@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
+import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.BudBoolean;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
@@ -29,17 +30,17 @@ public class ConditionSpecialForm extends CompoundExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment) {
+    public BudObject evaluate(Environment environment, Evaluator evaluator) {
         for (ConditionClause clause : clauses) {
             Expression test = clause.getTest();
-            BudObject tested = test.evaluate(environment);
+            BudObject tested = evaluator.evaluate(test, environment);
             if (BudBoolean.FALSE.equals(tested)) {
                 continue;
             }
 
             if (clause.hasRecipient()) {
                 Expression recipient = clause.getRecipient();
-                BudObject recipientObj = recipient.evaluate(environment);
+                BudObject recipientObj = evaluator.evaluate(recipient, environment);
                 if (!BudType.Category.FUNCTION.equals(recipientObj.getType().getCategory())) {
                     throw new NotApplicableException(recipient);
                 }
@@ -48,7 +49,7 @@ public class ConditionSpecialForm extends CompoundExpression {
                 return recipientFunction.apply(Collections.singletonList(tested));
             } else {
                 Expression consequent = clause.getConsequent();
-                return consequent.evaluate(environment);
+                return evaluator.evaluate(consequent, environment);
             }
         }
         if (elseExpression == null) {
@@ -56,7 +57,7 @@ public class ConditionSpecialForm extends CompoundExpression {
                     "no else-clause is found",
                     this);
         }
-        return elseExpression.evaluate(environment);
+        return evaluator.evaluate(elseExpression, environment);
     }
 
     @Override

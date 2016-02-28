@@ -168,6 +168,7 @@ class LexerIterator implements Iterator<Token> {
                                 return new CharacterToken(c, getBoolOrCharLocation());
                             }
                         }
+                        break;
                     case NORMAL:
                     default:
                         if (isWhiteSpace(currChar)) {

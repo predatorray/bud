@@ -11,7 +11,15 @@ import java.nio.file.Paths;
 
 public abstract class AbstractInterpreterTest extends AbstractBudLispTest {
 
-    private final BudInterpreter interpreter = new BudInterpreter();
+    private final BudInterpreter interpreter;
+
+    public AbstractInterpreterTest() {
+        this(new BudInterpreter());
+    }
+
+    public AbstractInterpreterTest(BudInterpreter interpreter) {
+        this.interpreter = interpreter;
+    }
 
     protected final void assertInterpretCorrectly(BudObject expected, String sourceClasspath)
             throws URISyntaxException, IOException {

@@ -19,7 +19,7 @@ public class Sets {
         Validation.notNull(collection2);
 
         int capacity = collection1.size() + collection2.size();
-        Set<T> union = new HashSet<T>(capacity);
+        Set<T> union = new HashSet<>(capacity);
         union.addAll(collection1);
         union.addAll(collection2);
         return union;

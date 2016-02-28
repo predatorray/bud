@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.lang;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
+import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.parser.Definition;
 import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.LambdaExpression;
@@ -21,10 +22,14 @@ public class LambdaFunction implements Function {
     private final Environment lexicalEnv;
     private final Variable self;
 
-    public LambdaFunction(LambdaExpression lambdaExpression, Environment lexicalEnv, Variable self) {
+    private final Evaluator evaluator;
+
+    public LambdaFunction(LambdaExpression lambdaExpression, Environment lexicalEnv, Variable self,
+                          Evaluator evaluator) {
         this.lambdaExpression = lambdaExpression;
         this.lexicalEnv = lexicalEnv;
         this.self = self;
+        this.evaluator = evaluator;
         this.formals = lambdaExpression.getFormals();
         this.definitions = lambdaExpression.getDefinitions();
         this.body = lambdaExpression.getBodyExpression();
@@ -37,6 +42,11 @@ public class LambdaFunction implements Function {
 
     @Override
     public BudObject apply(List<BudObject> arguments) {
+        Environment enclosing = generateEnvForBody(arguments);
+        return evaluator.evaluate(body, enclosing);
+    }
+
+    public Environment generateEnvForBody(List<BudObject> arguments) {
         int requires = formals.size();
         int actualSize = arguments.size();
         if (requires != actualSize) {
@@ -56,10 +66,9 @@ public class LambdaFunction implements Function {
             envDefined.bind(self, this);
         }
         for (Definition definition : definitions) {
-            definition.bind(envDefined);
+            definition.bind(envDefined, evaluator);
         }
-        Environment enclosing = new Environment(argumentBindings, envDefined.toEnvironment());
-        return body.evaluate(enclosing);
+        return new Environment(argumentBindings, envDefined.toEnvironment());
     }
 
     @Override

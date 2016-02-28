@@ -21,21 +21,36 @@ import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
 import me.predatorray.bud.lisp.parser.Variable;
 import me.predatorray.bud.lisp.test.AbstractBudLispTest;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-public class NaiveEvaluatorTest extends AbstractBudLispTest {
+@RunWith(Parameterized.class)
+public class EvaluatorsTest extends AbstractBudLispTest {
 
-    private final NaiveEvaluator sut = new NaiveEvaluator();
     private final Environment EMPTY_ENV = new Environment();
+
+    @Parameterized.Parameter(0)
+    public Evaluator sut;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(
+                new Object[] {new NaiveEvaluator()},
+                new Object[] {new ConcurrentEvaluator()}
+        );
+    }
 
     @Test
     public void testEvaluateString() throws Exception {
@@ -155,8 +170,8 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(andSpecialForm, EMPTY_ENV);
 
         assertEquals("(and #f #t) ==> #f", BudBoolean.FALSE, evaluated);
-        verify(falseExpression).evaluate(same(EMPTY_ENV));
-        verify(trueExpression, never()).evaluate(same(EMPTY_ENV));
+        verify(falseExpression).evaluate(same(EMPTY_ENV), same(sut));
+        verify(trueExpression, never()).evaluate(same(EMPTY_ENV), any(Evaluator.class));
     }
 
     @Test
@@ -171,8 +186,8 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(andSpecialForm, EMPTY_ENV);
 
         assertEquals("(and '() \"false\") ==> \"false\"", new BudString("false"), evaluated);
-        verify(tests[0]).evaluate(same(EMPTY_ENV));
-        verify(tests[1]).evaluate(same(EMPTY_ENV));
+        verify(tests[0]).evaluate(same(EMPTY_ENV), same(sut));
+        verify(tests[1]).evaluate(same(EMPTY_ENV), same(sut));
     }
 
     @Test
@@ -193,8 +208,8 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(orSpecialForm, EMPTY_ENV);
 
         assertEquals("(or #t #f) ==> #t", BudBoolean.TRUE, evaluated);
-        verify(trueExpression).evaluate(same(EMPTY_ENV));
-        verify(falseExpression, never()).evaluate(same(EMPTY_ENV));
+        verify(trueExpression).evaluate(same(EMPTY_ENV), same(sut));
+        verify(falseExpression, never()).evaluate(same(EMPTY_ENV), any(Evaluator.class));
     }
 
     @Test
@@ -207,8 +222,8 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(orSpecialForm, EMPTY_ENV);
 
         assertEquals("(or '() #f) ==> #t", BudBoolean.TRUE, evaluated);
-        verify(trueExpression).evaluate(same(EMPTY_ENV));
-        verify(falseExpression, never()).evaluate(same(EMPTY_ENV));
+        verify(trueExpression).evaluate(same(EMPTY_ENV), same(sut));
+        verify(falseExpression, never()).evaluate(same(EMPTY_ENV), any(Evaluator.class));
     }
 
     @Test
@@ -235,8 +250,8 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(condSpecialForm, EMPTY_ENV);
 
         assertEquals("(cond (#t \"1\") (#f \"2\")) ==> \"1\"", new BudString("1"), evaluated);
-        verify(tests[0]).evaluate(same(EMPTY_ENV));
-        verify(tests[1], never()).evaluate(same(EMPTY_ENV));
+        verify(tests[0]).evaluate(same(EMPTY_ENV), same(sut));
+        verify(tests[1], never()).evaluate(same(EMPTY_ENV), any(Evaluator.class));
     }
 
     @Test(expected = EvaluatingException.class)
@@ -272,8 +287,8 @@ public class NaiveEvaluatorTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(condSpecialForm, EMPTY_ENV);
 
         assertEquals("(cond (#f \"1\") (#f \"2\") (else \"3\")) ==> \"3\"", new BudString("3"), evaluated);
-        verify(tests[0]).evaluate(same(EMPTY_ENV));
-        verify(tests[1]).evaluate(same(EMPTY_ENV));
+        verify(tests[0]).evaluate(same(EMPTY_ENV), same(sut));
+        verify(tests[1]).evaluate(same(EMPTY_ENV), same(sut));
     }
 
     @Test

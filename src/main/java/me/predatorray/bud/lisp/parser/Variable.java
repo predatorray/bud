@@ -1,6 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
+import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
@@ -21,7 +22,7 @@ public class Variable extends TokenLocatedExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment) {
+    public BudObject evaluate(Environment environment, Evaluator evaluator) {
         BudObject bound = environment.lookup(this);
         if (bound == null) {
             throw new EvaluatingException("unbound variable", this);
