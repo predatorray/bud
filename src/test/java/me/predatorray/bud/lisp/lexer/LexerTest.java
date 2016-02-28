@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,5 +64,11 @@ public class LexerTest {
                 new Atmosphere(new TextLocation(1, 3)),
                 new BooleanToken(false, new TextLocation(1, 4))),
                 "#t #f");
+    }
+
+    @Test
+    public void testLexer5() {
+        assertMatches(Collections.singletonList(new CharacterToken((char) 1, new TextLocation(1, 1))),
+                "#\\001");
     }
 }

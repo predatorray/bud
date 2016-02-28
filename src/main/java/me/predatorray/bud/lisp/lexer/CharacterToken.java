@@ -44,6 +44,6 @@ public class CharacterToken implements Token {
 
     @Override
     public String toString() {
-        return "#\\" + c; // TODO escape
+        return String.format("#\\%03o", (int) c);
     }
 }
