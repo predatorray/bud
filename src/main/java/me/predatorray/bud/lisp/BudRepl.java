@@ -14,6 +14,7 @@ import me.predatorray.bud.lisp.parser.Parser;
 import me.predatorray.bud.lisp.parser.ParserException;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -70,10 +71,10 @@ public class BudRepl {
 
     public void execute(Reader reader, final Writer writer, Writer errorWriter) throws IOException {
         BufferedReader lineReader = new BufferedReader(reader);
-        final PrintWriter stdPrintWriter = toPrintWriter(writer);
-        final PrintWriter errPrintWriter = toPrintWriter(errorWriter);
+        final PrintWriter out = toPrintWriter(writer);
+        final PrintWriter err = toPrintWriter(errorWriter);
 
-        ReplParserCallback replParserCallback = new ReplParserCallback(stdPrintWriter);
+        ReplParserCallback replParserCallback = new ReplParserCallback(out);
         Parser parser = new Parser(replParserCallback);
 
         boolean exceptionOccurred = false;
@@ -84,11 +85,11 @@ public class BudRepl {
             try {
                 if (interactive) {
                     if (replParserCallback.hasAnyExpressionBeenEvaluated() || exceptionOccurred) {
-                        stdPrintWriter.print("bud> ");
+                        out.print("bud> ");
                     } else {
-                        stdPrintWriter.print("   > ");
+                        out.print("   > ");
                     }
-                    stdPrintWriter.flush();
+                    out.flush();
                 }
 
                 String line = lineReader.readLine();
@@ -101,7 +102,7 @@ public class BudRepl {
                 parser.feed(tokenIterator);
                 exceptionOccurred = false;
             } catch (LexerException | ParserException | EvaluatingException e) {
-                PrintWriter target = (interactive ? stdPrintWriter : errPrintWriter);
+                PrintWriter target = (interactive ? out : err);
                 target.println(e.getLocalizedMessage());
                 target.flush();
                 exceptionOccurred = true;
@@ -114,12 +115,15 @@ public class BudRepl {
     }
 
     public static void main(String... args) throws Exception {
-        BudRepl repl = new BudRepl();
+        Console console = System.console();
+        BudRepl repl = new BudRepl(console != null);
         Charset replEncoding = StandardCharsets.UTF_8;
+
+        Reader in = console == null ? new InputStreamReader(System.in, replEncoding) : console.reader();
+        Writer out = console == null ? new OutputStreamWriter(System.out, replEncoding) : console.writer();
+        Writer err = new OutputStreamWriter(System.err, replEncoding);
         try {
-            repl.execute(new InputStreamReader(System.in, replEncoding),
-                    new OutputStreamWriter(System.out, replEncoding),
-                    new OutputStreamWriter(System.err, replEncoding));
+            repl.execute(in, out, err);
         } catch (Exception unknownException) {
             unknownException.printStackTrace();
         }
