@@ -6,34 +6,38 @@ import me.predatorray.bud.lisp.lang.BudNumber;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
-public class AddFunction extends NamedFunction {
+public abstract class NumericArgumentFunction extends NamedFunction {
 
-    public AddFunction() {
-        super("+");
+    protected abstract BudObject applyNumbers(List<BudNumber> numbers);
+
+    protected abstract BudType checkArgumentSizeAndInspect(int size);
+
+    public NumericArgumentFunction(String ...names) {
+        super(names);
     }
 
     @Override
-    public BudType inspect(List<BudType> argumentTypes) {
-        for (int i = 0; i < argumentTypes.size(); i++) {
+    public final BudType inspect(List<BudType> argumentTypes) {
+        int size = argumentTypes.size();
+        for (int i = 0; i < size; i++) {
             BudType argumentType = argumentTypes.get(i);
             if (!BudType.NUMBER.equals(argumentType)) {
                 throw new ArgumentTypeMismatchException("expected arguments of type number, but the " +
                         (i + i) + "th argument is " + argumentType);
             }
         }
-        return BudType.NUMBER;
+        return checkArgumentSizeAndInspect(size);
     }
 
     @Override
-    public BudObject apply(List<BudObject> arguments) {
-        BigDecimal sum = BigDecimal.ZERO;
+    public final BudObject apply(List<BudObject> arguments) {
+        List<BudNumber> numbers = new ArrayList<>(arguments.size());
         for (BudObject argument : arguments) {
-            BudNumber number = (BudNumber) argument;
-            sum = sum.add(number.getValue());
+            numbers.add(((BudNumber) argument));
         }
-        return new BudNumber(sum);
+        return applyNumbers(numbers);
     }
 }

@@ -8,6 +8,10 @@ import java.util.List;
 
 public class MonoNonDecreasingPredicate extends NumericalPredicate {
 
+    public MonoNonDecreasingPredicate() {
+        super("<=");
+    }
+
     @Override
     protected void checkArgumentSize(int size) {
         if (size < 2) {

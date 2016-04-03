@@ -7,10 +7,12 @@ import me.predatorray.bud.lisp.lang.BudType;
 
 import java.math.BigDecimal;
 
-public class IntegerPredicate extends OneArgumentPredicate {
+public class EvenPredicate extends OneArgumentPredicate {
 
-    public IntegerPredicate() {
-        super("integer?");
+    private final BigDecimal TWO = new BigDecimal(2);
+
+    public EvenPredicate() {
+        super("even?");
     }
 
     @Override
@@ -20,6 +22,12 @@ public class IntegerPredicate extends OneArgumentPredicate {
         }
         BudNumber number = (BudNumber) argument;
         BigDecimal decimal = number.getValue();
-        return decimal.scale() <= 0;
+        int scale = decimal.scale();
+        if (scale > 0) {
+            return false;
+        } else {
+            BigDecimal[] divideAndRemainder = decimal.divideAndRemainder(TWO);
+            return BigDecimal.ZERO.equals(divideAndRemainder[1]);
+        }
     }
 }

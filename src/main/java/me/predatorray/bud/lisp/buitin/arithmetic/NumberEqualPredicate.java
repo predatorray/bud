@@ -2,14 +2,14 @@ package me.predatorray.bud.lisp.buitin.arithmetic;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudNumber;
-import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.FunctionType;
 
 import java.util.List;
 
 public class NumberEqualPredicate extends NumericalPredicate {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public NumberEqualPredicate() {
+        super("=");
+    }
 
     @Override
     protected void checkArgumentSize(int size) {
@@ -27,10 +27,5 @@ public class NumberEqualPredicate extends NumericalPredicate {
             }
         }
         return true;
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

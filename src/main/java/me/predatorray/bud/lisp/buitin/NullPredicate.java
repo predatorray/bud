@@ -4,13 +4,14 @@ import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudList;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.FunctionType;
 
 import java.util.List;
 
 public class NullPredicate extends Predicate {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public NullPredicate() {
+        super("null?");
+    }
 
     @Override
     protected void checkArgumentTypes(List<BudType> argumentTypes) {
@@ -27,10 +28,5 @@ public class NullPredicate extends Predicate {
         }
         BudList list = (BudList) argument;
         return list.isNull();
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

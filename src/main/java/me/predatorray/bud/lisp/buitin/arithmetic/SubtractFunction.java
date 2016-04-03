@@ -1,44 +1,32 @@
 package me.predatorray.bud.lisp.buitin.arithmetic;
 
-import me.predatorray.bud.lisp.evaluator.ArgumentTypeMismatchException;
 import me.predatorray.bud.lisp.lang.BudNumber;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.Function;
-import me.predatorray.bud.lisp.lang.FunctionType;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public class SubtractFunction implements Function {
+public class SubtractFunction extends NumericArgumentFunction {
 
-    private final FunctionType thisType = new FunctionType(this);
-
-    @Override
-    public BudType inspect(List<BudType> argumentTypes) {
-        for (int i = 0; i < argumentTypes.size(); i++) {
-            BudType argumentType = argumentTypes.get(i);
-            if (!BudType.NUMBER.equals(argumentType)) {
-                throw new ArgumentTypeMismatchException("expected arguments of type number, but the " +
-                        (i + 1) + "th argument is " + argumentType);
-            }
-        }
-        return BudType.NUMBER;
+    public SubtractFunction() {
+        super("-");
     }
 
     @Override
-    public BudObject apply(List<BudObject> arguments) {
-        if (arguments.isEmpty()) {
+    protected BudObject applyNumbers(List<BudNumber> numbers) {
+        if (numbers.isEmpty()) {
             return new BudNumber(BigDecimal.ZERO);
         }
 
-        if (arguments.size() == 1) {
-            return new BudNumber(((BudNumber) arguments.get(0)).getValue().negate());
+        if (numbers.size() == 1) {
+            BudNumber number = numbers.get(0);
+            return new BudNumber(number.getValue().negate());
         }
 
         BigDecimal result = null;
-        for (BudObject argument : arguments) {
-            BigDecimal number = ((BudNumber) argument).getValue();
+        for (BudNumber argument : numbers) {
+            BigDecimal number = argument.getValue();
             if (result == null) {
                 result = number;
             } else {
@@ -49,7 +37,7 @@ public class SubtractFunction implements Function {
     }
 
     @Override
-    public BudType getType() {
-        return thisType;
+    protected BudType checkArgumentSizeAndInspect(int size) {
+        return BudType.NUMBER;
     }
 }

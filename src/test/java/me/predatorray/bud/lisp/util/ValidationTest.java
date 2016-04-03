@@ -3,6 +3,7 @@ package me.predatorray.bud.lisp.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.Collections;
 
 public class ValidationTest {
@@ -39,7 +40,7 @@ public class ValidationTest {
 
     @Test(expected = NullPointerException.class)
     public void testNotEmpty1() throws Exception {
-        Validation.notEmpty(null);
+        Validation.notEmpty((Collection) null);
     }
 
     @Test(expected = IllegalArgumentException.class)

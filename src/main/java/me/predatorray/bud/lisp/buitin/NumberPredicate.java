@@ -3,16 +3,13 @@ package me.predatorray.bud.lisp.buitin;
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.FunctionType;
 
 import java.util.List;
 
 public class NumberPredicate extends Predicate {
 
-    private final FunctionType thisType;
-
     public NumberPredicate() {
-        thisType = new FunctionType(this);
+        super("number?");
     }
 
     @Override
@@ -25,10 +22,5 @@ public class NumberPredicate extends Predicate {
     @Override
     protected boolean predicate(List<BudObject> arguments) {
         return BudType.NUMBER.equals(arguments.get(0).getType());
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

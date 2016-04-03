@@ -5,12 +5,10 @@ import me.predatorray.bud.lisp.lang.BudNumber;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
 
-import java.math.BigDecimal;
+public class NegativePredicate extends OneArgumentPredicate {
 
-public class IntegerPredicate extends OneArgumentPredicate {
-
-    public IntegerPredicate() {
-        super("integer?");
+    public NegativePredicate() {
+        super("negative?");
     }
 
     @Override
@@ -19,7 +17,6 @@ public class IntegerPredicate extends OneArgumentPredicate {
             return false;
         }
         BudNumber number = (BudNumber) argument;
-        BigDecimal decimal = number.getValue();
-        return decimal.scale() <= 0;
+        return number.getValue().signum() == -1;
     }
 }
