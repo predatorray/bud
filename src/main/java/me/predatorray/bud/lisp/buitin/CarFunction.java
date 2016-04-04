@@ -5,15 +5,15 @@ import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudList;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.Function;
-import me.predatorray.bud.lisp.lang.FunctionType;
 import me.predatorray.bud.lisp.lang.ListType;
 
 import java.util.List;
 
-public class CarFunction implements Function {
+public class CarFunction extends NamedFunction {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public CarFunction() {
+        super("car");
+    }
 
     @Override
     public BudType inspect(List<BudType> argumentTypes) {
@@ -35,10 +35,5 @@ public class CarFunction implements Function {
             throw new EvaluatingException("cannot car an empty list");
         }
         return list.getElements().get(0);
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

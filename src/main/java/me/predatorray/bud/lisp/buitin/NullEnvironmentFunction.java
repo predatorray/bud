@@ -4,14 +4,14 @@ import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
 import me.predatorray.bud.lisp.lang.Environment;
-import me.predatorray.bud.lisp.lang.Function;
-import me.predatorray.bud.lisp.lang.FunctionType;
 
 import java.util.List;
 
-public class NullEnvironmentFunction implements Function {
+public class NullEnvironmentFunction extends NamedFunction {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public NullEnvironmentFunction() {
+        super("null-environment");
+    }
 
     @Override
     public BudType inspect(List<BudType> argumentTypes) {
@@ -24,10 +24,5 @@ public class NullEnvironmentFunction implements Function {
     @Override
     public BudObject apply(List<BudObject> arguments) {
         return new Environment();
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

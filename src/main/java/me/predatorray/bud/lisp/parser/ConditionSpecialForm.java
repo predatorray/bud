@@ -34,7 +34,7 @@ public class ConditionSpecialForm extends CompoundExpression {
         for (ConditionClause clause : clauses) {
             Expression test = clause.getTest();
             BudObject tested = evaluator.evaluate(test, environment);
-            if (BudBoolean.FALSE.equals(tested)) {
+            if (BudBoolean.isFalse(tested)) {
                 continue;
             }
 

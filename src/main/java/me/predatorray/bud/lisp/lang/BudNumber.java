@@ -4,7 +4,7 @@ import me.predatorray.bud.lisp.util.Validation;
 
 import java.math.BigDecimal;
 
-public class BudNumber implements BudObject {
+public class BudNumber implements BudObject, Comparable<BudNumber> {
 
     private final BigDecimal value;
 
@@ -39,5 +39,10 @@ public class BudNumber implements BudObject {
     @Override
     public String toString() {
         return value.toString();
+    }
+
+    @Override
+    public int compareTo(BudNumber o) {
+        return this.value.compareTo(o.value);
     }
 }

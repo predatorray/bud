@@ -3,11 +3,14 @@ package me.predatorray.bud.lisp.buitin;
 import me.predatorray.bud.lisp.lang.BudBoolean;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.Function;
 
 import java.util.List;
 
-public abstract class Predicate implements Function {
+public abstract class Predicate extends NamedFunction {
+
+    public Predicate(String ...names) {
+        super(names);
+    }
 
     @Override
     public final BudType inspect(List<BudType> argumentTypes) {

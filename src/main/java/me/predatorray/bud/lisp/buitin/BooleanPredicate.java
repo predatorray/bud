@@ -3,13 +3,14 @@ package me.predatorray.bud.lisp.buitin;
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.FunctionType;
 
 import java.util.List;
 
 public class BooleanPredicate extends Predicate {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public BooleanPredicate() {
+        super("boolean?", "bool?");
+    }
 
     @Override
     protected void checkArgumentTypes(List<BudType> argumentTypes) {
@@ -21,10 +22,5 @@ public class BooleanPredicate extends Predicate {
     @Override
     protected boolean predicate(List<BudObject> arguments) {
         return BudType.BOOLEAN.equals(arguments.get(0).getType());
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

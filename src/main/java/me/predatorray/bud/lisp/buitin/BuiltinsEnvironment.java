@@ -1,13 +1,6 @@
 package me.predatorray.bud.lisp.buitin;
 
-import me.predatorray.bud.lisp.buitin.arithmetic.AddFunction;
-import me.predatorray.bud.lisp.buitin.arithmetic.MonoDecreasingPredicate;
-import me.predatorray.bud.lisp.buitin.arithmetic.MonoIncreasingPredicate;
-import me.predatorray.bud.lisp.buitin.arithmetic.MonoNonDecreasingPredicate;
-import me.predatorray.bud.lisp.buitin.arithmetic.MonoNonIncreasingPredicate;
-import me.predatorray.bud.lisp.buitin.arithmetic.MultiplyFunction;
-import me.predatorray.bud.lisp.buitin.arithmetic.NumberEqualPredicate;
-import me.predatorray.bud.lisp.buitin.arithmetic.SubtractFunction;
+import me.predatorray.bud.lisp.buitin.arithmetic.*;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
 
@@ -20,32 +13,46 @@ public class BuiltinsEnvironment {
     static {
         Map<String, BudObject> initial = new HashMap<>();
 
-        initial.put("eq?", new EqPredicate());
-        initial.put("equals?", new EqualPredicate());
-        initial.put("boolean?", new BooleanPredicate());
-        initial.put("string?", new StringPredicate());
-        initial.put("number?", new NumberPredicate());
-        initial.put("list?", new ListPredicate());
-        initial.put("function?", new FunctionPredicate());
-        initial.put("null?", new NullPredicate());
+        NamedFunction[] builtInFunctions = new NamedFunction[] {
+                new EqPredicate(),
+                new EqualPredicate(),
+                new BooleanPredicate(),
+                new StringPredicate(),
+                new NumberPredicate(),
+                new ListPredicate(),
+                new FunctionPredicate(),
+                new NullPredicate(),
 
-        initial.put("car", new CarFunction());
-        initial.put("cdr", new CdrFunction());
-        initial.put("cons", new ConsFunction());
+                new CarFunction(),
+                new CdrFunction(),
+                new ConsFunction(),
 
-        initial.put("+", new AddFunction());
-        initial.put("-", new SubtractFunction());
-        initial.put("*", new MultiplyFunction());
-        initial.put("=", new NumberEqualPredicate());
-        initial.put("<", new MonoIncreasingPredicate());
-        initial.put(">", new MonoDecreasingPredicate());
-        initial.put(">=", new MonoNonIncreasingPredicate());
-        initial.put("<=", new MonoNonDecreasingPredicate());
+                new AddFunction(),
+                new SubtractFunction(),
+                new MultiplyFunction(),
+                new DivideFunction(),
+                new AbsFunction(),
+                new NumberEqualPredicate(),
+                new MonoIncreasingPredicate(),
+                new MonoDecreasingPredicate(),
+                new MonoNonIncreasingPredicate(),
+                new MonoNonDecreasingPredicate(),
+                new IntegerPredicate(),
+                new MaxFunction(),
+                new MinFunction(),
+                new PositivePredicate(),
+                new NegativePredicate(),
+                new ZeroPredicate(),
+                new OddPredicate(),
+                new EvenPredicate(),
 
-        initial.put("null-environment", new NullEnvironmentFunction());
-        initial.put("builtins-environment", new BuiltinsEnvironmentFunction());
-
-        initial.put("list->typed-list", new ConvertListElementTypeFunction());
+                new NullEnvironmentFunction(),
+                new BuiltinsEnvironmentFunction(),
+                new ConvertListElementTypeFunction()
+        };
+        for (NamedFunction builtInFunction : builtInFunctions) {
+            builtInFunction.register(initial);
+        }
 
         INSTANCE = Environment.toEnvironment(initial, "builtins");
     }

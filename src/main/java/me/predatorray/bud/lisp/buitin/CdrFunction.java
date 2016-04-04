@@ -5,14 +5,14 @@ import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudList;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.Function;
-import me.predatorray.bud.lisp.lang.FunctionType;
 
 import java.util.List;
 
-public class CdrFunction implements Function {
+public class CdrFunction extends NamedFunction {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public CdrFunction() {
+        super("cdr");
+    }
 
     @Override
     public BudType inspect(List<BudType> argumentTypes) {
@@ -34,10 +34,5 @@ public class CdrFunction implements Function {
         }
         List<BudObject> cdrElements = list.getElements().subList(1, list.getSize());
         return new BudList(list.getType().getElementType(), cdrElements);
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

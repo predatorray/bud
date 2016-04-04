@@ -28,7 +28,7 @@ public class AndSpecialForm extends CompoundExpression {
         BudObject eachTested = BudBoolean.TRUE;
         for (Expression test : tests) {
             eachTested = evaluator.evaluate(test, environment);
-            if (BudBoolean.FALSE.equals(eachTested)) {
+            if (BudBoolean.isFalse(eachTested)) {
                 return eachTested;
             }
         }

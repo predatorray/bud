@@ -5,16 +5,16 @@ import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudList;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.Function;
-import me.predatorray.bud.lisp.lang.FunctionType;
 import me.predatorray.bud.lisp.lang.ListType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConsFunction implements Function {
+public class ConsFunction extends NamedFunction {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public ConsFunction() {
+        super("cons");
+    }
 
     @Override
     public BudType inspect(List<BudType> argumentTypes) {
@@ -47,10 +47,5 @@ public class ConsFunction implements Function {
         consElements.addAll(cdr.getElements());
         ListType listType = consType(car.getType(), cdr.getType());
         return new BudList(listType.getElementType(), consElements);
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

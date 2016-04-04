@@ -2,19 +2,15 @@ package me.predatorray.bud.lisp.buitin;
 
 import me.predatorray.bud.lisp.evaluator.ArgumentTypeMismatchException;
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
-import me.predatorray.bud.lisp.lang.BudList;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.Function;
-import me.predatorray.bud.lisp.lang.FunctionType;
-import me.predatorray.bud.lisp.lang.ListType;
-import me.predatorray.bud.lisp.lang.Symbol;
+import me.predatorray.bud.lisp.lang.*;
 
 import java.util.List;
 
-public class ConvertListElementTypeFunction implements Function {
+public class ConvertListElementTypeFunction extends NamedFunction {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public ConvertListElementTypeFunction() {
+        super("list->typed-list");
+    }
 
     @Override
     public BudType inspect(List<BudType> argumentTypes) {
@@ -62,10 +58,5 @@ public class ConvertListElementTypeFunction implements Function {
         }
 
         return new BudList(elementType, list.getElements());
-    }
-
-    @Override
-    public FunctionType getType() {
-        return thisType;
     }
 }

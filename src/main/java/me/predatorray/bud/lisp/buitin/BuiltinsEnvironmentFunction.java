@@ -3,14 +3,14 @@ package me.predatorray.bud.lisp.buitin;
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.Function;
-import me.predatorray.bud.lisp.lang.FunctionType;
 
 import java.util.List;
 
-public class BuiltinsEnvironmentFunction implements Function {
+public class BuiltinsEnvironmentFunction extends NamedFunction {
 
-    private final FunctionType thisType = new FunctionType(this);
+    public BuiltinsEnvironmentFunction() {
+        super("builtins-environment");
+    }
 
     @Override
     public BudType inspect(List<BudType> argumentTypes) {
@@ -23,10 +23,5 @@ public class BuiltinsEnvironmentFunction implements Function {
     @Override
     public BudObject apply(List<BudObject> arguments) {
         return BuiltinsEnvironment.INSTANCE;
-    }
-
-    @Override
-    public BudType getType() {
-        return thisType;
     }
 }

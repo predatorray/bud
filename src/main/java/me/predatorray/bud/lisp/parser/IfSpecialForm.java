@@ -28,7 +28,7 @@ public class IfSpecialForm extends CompoundExpression {
     @Override
     public BudObject evaluate(Environment environment, Evaluator evaluator) {
         BudObject tested = evaluator.evaluate(test, environment);
-        if (!BudBoolean.FALSE.equals(tested)) { // any object not #f is treated as true
+        if (BudBoolean.isTrue(tested)) { // any object not #f is treated as true
             return evaluator.evaluate(consequent, environment);
         } else {
             return evaluator.evaluate(alternate, environment);
