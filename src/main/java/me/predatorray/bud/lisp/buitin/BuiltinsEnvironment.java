@@ -30,6 +30,8 @@ public class BuiltinsEnvironment {
                 new AddFunction(),
                 new SubtractFunction(),
                 new MultiplyFunction(),
+                new DivideFunction(),
+                new AbsFunction(),
                 new NumberEqualPredicate(),
                 new MonoIncreasingPredicate(),
                 new MonoDecreasingPredicate(),
