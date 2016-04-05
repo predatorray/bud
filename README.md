@@ -30,19 +30,23 @@ Install the artifact to your local repository
 
 Add the dependency in you pom.xml.
 
-    <dependency>
-        <groupId>me.predatorray</groupId>
-        <artifactId>bud</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </dependency>
+```xml
+<dependency>
+    <groupId>me.predatorray</groupId>
+    <artifactId>bud</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+```
 
 And, here is an example of evaluating source code:
 
-    String sourceCode = "(+ 1 1)"
-    Lexer lexer = new Lexer(sourceCode);
-    Parser parser = new Parser();
-    List<Expression> expressions = parser.parse(lexer); // In our case, only one expression is returned.
-    Evaluator evaluator = new NaiveEvaluator();
-    // Finally, evaluates the first expression under the default environment
-    BudObject result = evaluator.evaluate(expressions.get(0), BuiltinsEnvironment.INSTANCE);
-    assert new BudNumber(new BigDecimal(2)).equals(result);
+```java
+String sourceCode = "(+ 1 1)"
+Lexer lexer = new Lexer(sourceCode);
+Parser parser = new Parser();
+List<Expression> expressions = parser.parse(lexer); // In our case, only one expression is returned.
+Evaluator evaluator = new NaiveEvaluator();
+// Finally, evaluates the first expression under the default environment
+BudObject result = evaluator.evaluate(expressions.get(0), BuiltinsEnvironment.INSTANCE);
+assert new BudNumber(new BigDecimal(2)).equals(result);
+```
