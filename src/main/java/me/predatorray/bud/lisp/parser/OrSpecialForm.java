@@ -1,9 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.lang.BudBoolean;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.*;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
@@ -33,6 +31,23 @@ public class OrSpecialForm extends CompoundExpression {
             }
         }
         return eachTested;
+    }
+
+    @Override
+    public BudFuture evaluateAndGetBudFuture(Environment environment, Evaluator evaluator) {
+        if (tests.isEmpty()) {
+            return new CompletedBudFuture(BudBoolean.FALSE);
+        }
+        int last = tests.size() - 1;
+        for (int i = 0; i < last; i++) {
+            Expression test = tests.get(i);
+            BudObject tested = evaluator.evaluate(test, environment);
+            if (BudBoolean.isTrue(tested)) {
+                return new CompletedBudFuture(tested);
+            }
+        }
+
+        return new TailExpressionBudFuture(tests.get(last), environment, evaluator);
     }
 
     public List<Expression> getTests() {

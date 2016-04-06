@@ -2,23 +2,8 @@ package me.predatorray.bud.lisp.evaluator;
 
 import me.predatorray.bud.lisp.buitin.BuiltinsEnvironment;
 import me.predatorray.bud.lisp.buitin.EqualPredicate;
-import me.predatorray.bud.lisp.lang.BudBoolean;
-import me.predatorray.bud.lisp.lang.BudList;
-import me.predatorray.bud.lisp.lang.BudNumber;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.BudString;
-import me.predatorray.bud.lisp.lang.Environment;
-import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.AndSpecialForm;
-import me.predatorray.bud.lisp.parser.ConditionClause;
-import me.predatorray.bud.lisp.parser.ConditionSpecialForm;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.IfSpecialForm;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.OrSpecialForm;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.lang.*;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.test.AbstractBudLispTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,11 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.same;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(Parameterized.class)
 public class EvaluatorsTest extends AbstractBudLispTest {
@@ -48,7 +29,8 @@ public class EvaluatorsTest extends AbstractBudLispTest {
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[] {new NaiveEvaluator()},
-                new Object[] {new ConcurrentEvaluator()}
+                new Object[] {new ConcurrentEvaluator()},
+                new Object[] {new TocEvaluator()}
         );
     }
 

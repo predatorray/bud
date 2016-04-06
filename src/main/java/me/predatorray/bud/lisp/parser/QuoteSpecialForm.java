@@ -1,23 +1,9 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.lang.BudBoolean;
-import me.predatorray.bud.lisp.lang.BudCharacter;
-import me.predatorray.bud.lisp.lang.BudList;
-import me.predatorray.bud.lisp.lang.BudNumber;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.BudString;
-import me.predatorray.bud.lisp.lang.Environment;
-import me.predatorray.bud.lisp.lang.Symbol;
+import me.predatorray.bud.lisp.lang.*;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
-import me.predatorray.bud.lisp.parser.datum.BooleanDatum;
-import me.predatorray.bud.lisp.parser.datum.CharacterDatum;
-import me.predatorray.bud.lisp.parser.datum.CompoundDatum;
-import me.predatorray.bud.lisp.parser.datum.Datum;
-import me.predatorray.bud.lisp.parser.datum.DatumVisitor;
-import me.predatorray.bud.lisp.parser.datum.NumberDatum;
-import me.predatorray.bud.lisp.parser.datum.StringDatum;
-import me.predatorray.bud.lisp.parser.datum.SymbolDatum;
+import me.predatorray.bud.lisp.parser.datum.*;
 import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.ArrayList;
@@ -44,6 +30,11 @@ public class QuoteSpecialForm extends TokenLocatedExpression {
         return constructor.datumObject;
     }
 
+    @Override
+    public BudFuture evaluateAndGetBudFuture(Environment environment, Evaluator evaluator) {
+        return new CompletedBudFuture(evaluate(environment, evaluator));
+    }
+
     public Datum getQuotedDatum() {
         return quotedDatum;
     }
@@ -68,7 +59,7 @@ public class QuoteSpecialForm extends TokenLocatedExpression {
         return "(quote " + quotedDatum + ")";
     }
 
-    class DatumObjectConstructor implements DatumVisitor {
+    private class DatumObjectConstructor implements DatumVisitor {
 
         private BudObject datumObject;
 
