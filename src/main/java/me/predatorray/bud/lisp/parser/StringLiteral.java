@@ -1,9 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.BudString;
-import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.*;
 import me.predatorray.bud.lisp.lexer.StringToken;
 import me.predatorray.bud.lisp.util.StringUtils;
 
@@ -24,6 +22,11 @@ public class StringLiteral extends TokenLocatedExpression {
     @Override
     public BudObject evaluate(Environment environment, Evaluator evaluator) {
         return new BudString(value);
+    }
+
+    @Override
+    public BudFuture evaluateAndGetBudFuture(Environment environment, Evaluator evaluator) {
+        return new CompletedBudFuture(evaluate(environment, evaluator));
     }
 
     public String getValue() {

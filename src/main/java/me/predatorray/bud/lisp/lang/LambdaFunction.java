@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LambdaFunction implements Function {
+public class LambdaFunction implements Function, TailCallFunction {
 
     private final FunctionType thisType = new FunctionType(this);
     private final List<Variable> formals;
@@ -46,7 +46,13 @@ public class LambdaFunction implements Function {
         return evaluator.evaluate(body, enclosing);
     }
 
-    public Environment generateEnvForBody(List<BudObject> arguments) {
+    @Override
+    public BudFuture applyAndGetBudFuture(List<BudObject> arguments) {
+        Environment enclosing = generateEnvForBody(arguments);
+        return new TailExpressionBudFuture(body, enclosing, evaluator);
+    }
+
+    private Environment generateEnvForBody(List<BudObject> arguments) {
         int requires = formals.size();
         int actualSize = arguments.size();
         if (requires != actualSize) {

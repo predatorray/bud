@@ -1,9 +1,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.lang.BudNumber;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.*;
 import me.predatorray.bud.lisp.lexer.NumberToken;
 
 import java.math.BigDecimal;
@@ -25,6 +23,11 @@ public class NumberLiteral extends TokenLocatedExpression {
     @Override
     public BudObject evaluate(Environment environment, Evaluator evaluator) {
         return new BudNumber(value);
+    }
+
+    @Override
+    public BudFuture evaluateAndGetBudFuture(Environment environment, Evaluator evaluator) {
+        return new CompletedBudFuture(evaluate(environment, evaluator));
     }
 
     @Override
