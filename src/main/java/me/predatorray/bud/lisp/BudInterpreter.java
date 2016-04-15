@@ -1,6 +1,6 @@
 package me.predatorray.bud.lisp;
 
-import me.predatorray.bud.lisp.buitin.BuiltinsEnvironment;
+import me.predatorray.bud.lisp.builtin.BuiltinsEnvironment;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.evaluator.NaiveEvaluator;
 import me.predatorray.bud.lisp.lang.BudObject;
