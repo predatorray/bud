@@ -2,56 +2,23 @@ package me.predatorray.bud.lisp.evaluator;
 
 import me.predatorray.bud.lisp.builtin.BuiltinsEnvironment;
 import me.predatorray.bud.lisp.builtin.EqualPredicate;
-import me.predatorray.bud.lisp.lang.BudBoolean;
-import me.predatorray.bud.lisp.lang.BudList;
-import me.predatorray.bud.lisp.lang.BudNumber;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.BudString;
-import me.predatorray.bud.lisp.lang.Environment;
-import me.predatorray.bud.lisp.lang.Symbol;
-import me.predatorray.bud.lisp.parser.AndSpecialForm;
-import me.predatorray.bud.lisp.parser.ConditionClause;
-import me.predatorray.bud.lisp.parser.ConditionSpecialForm;
-import me.predatorray.bud.lisp.parser.Definition;
-import me.predatorray.bud.lisp.parser.Expression;
-import me.predatorray.bud.lisp.parser.IfSpecialForm;
-import me.predatorray.bud.lisp.parser.LambdaExpression;
-import me.predatorray.bud.lisp.parser.OrSpecialForm;
-import me.predatorray.bud.lisp.parser.QuoteSpecialForm;
-import me.predatorray.bud.lisp.parser.Variable;
+import me.predatorray.bud.lisp.lang.*;
+import me.predatorray.bud.lisp.parser.*;
 import me.predatorray.bud.lisp.test.AbstractBudLispTest;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.same;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
-@RunWith(Parameterized.class)
 public class EvaluatorsTest extends AbstractBudLispTest {
 
     private final Environment EMPTY_ENV = new Environment();
 
-    @Parameterized.Parameter(0)
-    public Evaluator sut;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(
-                new Object[] {new NaiveEvaluator()},
-                new Object[] {new ConcurrentEvaluator()},
-                new Object[] {new TcoEvaluator()}
-        );
-    }
+    private Evaluator sut = new TcoEvaluator();
 
     @Test
     public void testEvaluateString() throws Exception {
@@ -171,8 +138,8 @@ public class EvaluatorsTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(andSpecialForm, EMPTY_ENV);
 
         assertEquals("(and #f #t) ==> #f", BudBoolean.FALSE, evaluated);
-        verify(falseExpression).evaluate(same(EMPTY_ENV), same(sut));
-        verify(trueExpression, never()).evaluate(same(EMPTY_ENV), any(Evaluator.class));
+        verifyThatExpressionIsEvaluatedUnder(falseExpression, EMPTY_ENV);
+        verifyThatExpressionIsNeverEvaluated(trueExpression);
     }
 
     @Test
@@ -187,8 +154,8 @@ public class EvaluatorsTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(andSpecialForm, EMPTY_ENV);
 
         assertEquals("(and '() \"false\") ==> \"false\"", new BudString("false"), evaluated);
-        verify(tests[0]).evaluate(same(EMPTY_ENV), same(sut));
-        verify(tests[1]).evaluate(same(EMPTY_ENV), same(sut));
+        verifyThatExpressionIsEvaluatedUnder(tests[0], EMPTY_ENV);
+        verifyThatExpressionIsEvaluatedUnder(tests[1], EMPTY_ENV);
     }
 
     @Test
@@ -209,8 +176,8 @@ public class EvaluatorsTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(orSpecialForm, EMPTY_ENV);
 
         assertEquals("(or #t #f) ==> #t", BudBoolean.TRUE, evaluated);
-        verify(trueExpression).evaluate(same(EMPTY_ENV), same(sut));
-        verify(falseExpression, never()).evaluate(same(EMPTY_ENV), any(Evaluator.class));
+        verifyThatExpressionIsEvaluatedUnder(trueExpression, EMPTY_ENV);
+        verifyThatExpressionIsNeverEvaluated(falseExpression);
     }
 
     @Test
@@ -223,8 +190,8 @@ public class EvaluatorsTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(orSpecialForm, EMPTY_ENV);
 
         assertEquals("(or '() #f) ==> #t", BudBoolean.TRUE, evaluated);
-        verify(trueExpression).evaluate(same(EMPTY_ENV), same(sut));
-        verify(falseExpression, never()).evaluate(same(EMPTY_ENV), any(Evaluator.class));
+        verifyThatExpressionIsEvaluatedUnder(trueExpression, EMPTY_ENV);
+        verifyThatExpressionIsNeverEvaluated(falseExpression);
     }
 
     @Test
@@ -251,8 +218,8 @@ public class EvaluatorsTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(condSpecialForm, EMPTY_ENV);
 
         assertEquals("(cond (#t \"1\") (#f \"2\")) ==> \"1\"", new BudString("1"), evaluated);
-        verify(tests[0]).evaluate(same(EMPTY_ENV), same(sut));
-        verify(tests[1], never()).evaluate(same(EMPTY_ENV), any(Evaluator.class));
+        verifyThatExpressionIsEvaluatedUnder(tests[0], EMPTY_ENV);
+        verifyThatExpressionIsNeverEvaluated(tests[1]);
     }
 
     @Test(expected = EvaluatingException.class)
@@ -288,8 +255,8 @@ public class EvaluatorsTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(condSpecialForm, EMPTY_ENV);
 
         assertEquals("(cond (#f \"1\") (#f \"2\") (else \"3\")) ==> \"3\"", new BudString("3"), evaluated);
-        verify(tests[0]).evaluate(same(EMPTY_ENV), same(sut));
-        verify(tests[1]).evaluate(same(EMPTY_ENV), same(sut));
+        verifyThatExpressionIsEvaluatedUnder(tests[0], EMPTY_ENV);
+        verifyThatExpressionIsEvaluatedUnder(tests[1], EMPTY_ENV);
     }
 
     @Test
@@ -304,5 +271,13 @@ public class EvaluatorsTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(condSpecialForm, BuiltinsEnvironment.INSTANCE);
 
         assertEquals("(cond (1 => -)) ==> -1", new BudNumber(new BigDecimal(-1)), evaluated);
+    }
+
+    private void verifyThatExpressionIsEvaluatedUnder(Expression expressionSpy, Environment environment) {
+        verify(expressionSpy).evaluate(same(environment), same(sut));
+    }
+
+    private void verifyThatExpressionIsNeverEvaluated(Expression expressionSpy) {
+        verify(expressionSpy, never()).evaluate(any(Environment.class), any(Evaluator.class));
     }
 }

@@ -27,5 +27,5 @@ import java.util.List;
 
 public interface TailCallFunction extends Function {
 
-    BudFuture applyAndGetBudFuture(List<BudObject> arguments);
+    Continuous applyAndGetBudFuture(List<BudObject> arguments);
 }

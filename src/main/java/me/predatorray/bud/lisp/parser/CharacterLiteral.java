@@ -25,10 +25,9 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.BudCharacter;
-import me.predatorray.bud.lisp.lang.BudFuture;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.CompletedBudFuture;
+import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.Terminal;
 import me.predatorray.bud.lisp.lexer.CharacterToken;
 
 public class CharacterLiteral extends TokenLocatedExpression {
@@ -48,13 +47,8 @@ public class CharacterLiteral extends TokenLocatedExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment, Evaluator evaluator) {
-        return new BudCharacter(value);
-    }
-
-    @Override
-    public BudFuture evaluateAndGetBudFuture(Environment environment, Evaluator evaluator) {
-        return new CompletedBudFuture(evaluate(environment, evaluator));
+    public Continuous evaluate(Environment environment, Evaluator evaluator) {
+        return new Terminal(new BudCharacter(value));
     }
 
     public char getValue() {

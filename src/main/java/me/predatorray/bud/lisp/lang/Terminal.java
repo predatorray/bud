@@ -21,16 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package me.predatorray.bud.lisp.evaluator;
+package me.predatorray.bud.lisp.lang;
 
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.Environment;
-import me.predatorray.bud.lisp.parser.Expression;
+public final class Terminal implements Continuous {
 
-public class NaiveEvaluator implements Evaluator {
+    private final BudObject result;
+
+    public Terminal(BudObject result) {
+        this.result = result;
+    }
 
     @Override
-    public BudObject evaluate(Expression expression, Environment environment) {
-        return expression.evaluate(environment, this);
+    public BudObject getResult() {
+        return result;
+    }
+
+    @Override
+    public Continuous getSuccessor() {
+        return null;
     }
 }

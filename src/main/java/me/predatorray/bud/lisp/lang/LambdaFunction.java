@@ -70,9 +70,9 @@ public class LambdaFunction implements Function, TailCallFunction {
     }
 
     @Override
-    public BudFuture applyAndGetBudFuture(List<BudObject> arguments) {
+    public Continuous applyAndGetBudFuture(List<BudObject> arguments) {
         Environment enclosing = generateEnvForBody(arguments);
-        return new TailExpressionBudFuture(body, enclosing, evaluator);
+        return new TailExpression(body, enclosing, evaluator);
     }
 
     private Environment generateEnvForBody(List<BudObject> arguments) {

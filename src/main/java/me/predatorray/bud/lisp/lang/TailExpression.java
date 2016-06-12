@@ -23,9 +23,29 @@
  */
 package me.predatorray.bud.lisp.lang;
 
-public interface BudFuture {
+import me.predatorray.bud.lisp.evaluator.Evaluator;
+import me.predatorray.bud.lisp.parser.Expression;
+import me.predatorray.bud.lisp.util.Validation;
 
-    BudObject getResult();
+public final class TailExpression implements Continuous {
 
-    BudFuture getTailCall();
+    private final Expression tailExpression;
+    private final Environment environment;
+    private final Evaluator evaluator;
+
+    public TailExpression(Expression tailExpression, Environment environment, Evaluator evaluator) {
+        this.tailExpression = Validation.notNull(tailExpression);
+        this.environment = Validation.notNull(environment);
+        this.evaluator = Validation.notNull(evaluator);
+    }
+
+    @Override
+    public BudObject getResult() {
+        return null;
+    }
+
+    @Override
+    public Continuous getSuccessor() {
+        return tailExpression.evaluate(environment, evaluator);
+    }
 }

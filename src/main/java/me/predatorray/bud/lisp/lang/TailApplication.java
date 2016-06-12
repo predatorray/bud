@@ -23,21 +23,32 @@
  */
 package me.predatorray.bud.lisp.lang;
 
-public final class CompletedBudFuture implements BudFuture {
+import me.predatorray.bud.lisp.util.Validation;
 
-    private final BudObject result;
+import java.util.List;
 
-    public CompletedBudFuture(BudObject result) {
-        this.result = result;
+public final class TailApplication implements Continuous {
+
+    private final Function function;
+    private final List<BudObject> arguments;
+
+    public TailApplication(Function function, List<BudObject> arguments) {
+        this.function = Validation.notNull(function);
+        this.arguments = Validation.notNull(arguments);
     }
 
     @Override
     public BudObject getResult() {
-        return result;
+        return null;
     }
 
     @Override
-    public BudFuture getTailCall() {
-        return null;
+    public Continuous getSuccessor() {
+        if (function instanceof TailCallFunction) {
+            TailCallFunction tailCallFunction = (TailCallFunction) this.function;
+            return tailCallFunction.applyAndGetBudFuture(arguments);
+        } else {
+            return new Terminal(function.apply(arguments));
+        }
     }
 }

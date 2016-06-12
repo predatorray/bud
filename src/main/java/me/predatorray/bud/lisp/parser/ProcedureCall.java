@@ -25,12 +25,7 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.lang.BudFuture;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.BudType;
-import me.predatorray.bud.lisp.lang.Environment;
-import me.predatorray.bud.lisp.lang.Function;
-import me.predatorray.bud.lisp.lang.TailApplicationBudFuture;
+import me.predatorray.bud.lisp.lang.*;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
@@ -54,19 +49,7 @@ public class ProcedureCall extends CompoundExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment, Evaluator evaluator) {
-        BudObject applicable = evaluator.evaluate(operator, environment);
-        List<BudObject> arguments = new ArrayList<>(operands.size());
-        for (Expression operand : operands) {
-            BudObject arg = evaluator.evaluate(operand, environment);
-            arguments.add(arg);
-        }
-
-        return apply(applicable, arguments);
-    }
-
-    @Override
-    public BudFuture evaluateAndGetBudFuture(Environment environment, Evaluator evaluator) {
+    public Continuous evaluate(Environment environment, Evaluator evaluator) {
         BudObject applicable = evaluator.evaluate(operator, environment);
         List<BudObject> arguments = new ArrayList<>(operands.size());
         for (Expression operand : operands) {
@@ -85,7 +68,7 @@ public class ProcedureCall extends CompoundExpression {
         }
         function.inspect(argTypes);
 
-        return new TailApplicationBudFuture(function, arguments);
+        return new TailApplication(function, arguments);
     }
 
     public static BudObject apply(BudObject applicable, List<BudObject> arguments) {

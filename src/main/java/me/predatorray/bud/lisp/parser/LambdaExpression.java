@@ -24,11 +24,10 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.lang.BudFuture;
-import me.predatorray.bud.lisp.lang.BudObject;
-import me.predatorray.bud.lisp.lang.CompletedBudFuture;
+import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.LambdaFunction;
+import me.predatorray.bud.lisp.lang.Terminal;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.StringUtils;
 import me.predatorray.bud.lisp.util.Validation;
@@ -66,13 +65,8 @@ public class LambdaExpression extends TokenLocatedExpression {
     }
 
     @Override
-    public BudObject evaluate(Environment environment, Evaluator evaluator) {
-        return new LambdaFunction(this, environment, self, evaluator);
-    }
-
-    @Override
-    public BudFuture evaluateAndGetBudFuture(Environment environment, Evaluator evaluator) {
-        return new CompletedBudFuture(evaluate(environment, evaluator));
+    public Continuous evaluate(Environment environment, Evaluator evaluator) {
+        return new Terminal(new LambdaFunction(this, environment, self, evaluator));
     }
 
     @Override
