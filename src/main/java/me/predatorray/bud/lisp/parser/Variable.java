@@ -29,6 +29,8 @@ import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Terminal;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
+import me.predatorray.bud.lisp.lang.cont.Termination;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
 import me.predatorray.bud.lisp.util.Validation;
 
@@ -53,6 +55,15 @@ public class Variable extends TokenLocatedExpression {
             throw new EvaluatingException("unbound variable", this);
         }
         return new Terminal(bound);
+    }
+
+    @Override
+    public Continuation evalCont(Environment environment, Evaluator evaluator) {
+        BudObject bound = environment.lookup(this);
+        if (bound == null) {
+            throw new EvaluatingException("unbound variable", this);
+        }
+        return new Termination(bound);
     }
 
     public String getVariableName() {

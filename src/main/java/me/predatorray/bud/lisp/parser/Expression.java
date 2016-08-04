@@ -24,6 +24,7 @@
 package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
 import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lexer.TextLocation;
@@ -34,5 +35,8 @@ public interface Expression {
 
     void accept(ExpressionVisitor expressionVisitor);
 
+    @Deprecated
     Continuous evaluate(Environment environment, Evaluator evaluator);
+
+    Continuation evalCont(Environment environment, Evaluator evaluator);
 }

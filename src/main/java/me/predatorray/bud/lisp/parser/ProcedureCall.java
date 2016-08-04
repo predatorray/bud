@@ -26,7 +26,10 @@ package me.predatorray.bud.lisp.parser;
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.*;
+import me.predatorray.bud.lisp.lang.cont.ApplicationCont;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
+import me.predatorray.bud.lisp.util.CollectionUtils;
 import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.ArrayList;
@@ -69,6 +72,59 @@ public class ProcedureCall extends CompoundExpression {
         function.inspect(argTypes);
 
         return new TailApplication(function, arguments);
+    }
+
+    @Override
+    public Continuation evalCont(final Environment environment, final Evaluator evaluator) {
+        return new ProcedureCallCont(environment, evaluator);
+    }
+
+    private class ProcedureCallCont implements Continuation {
+
+        private final BudObject applicable;
+        private final List<BudObject> arguments;
+
+        private final Environment environment;
+        private final Evaluator evaluator;
+
+        ProcedureCallCont(Environment environment, Evaluator evaluator) {
+            this(null, null, environment, evaluator);
+        }
+
+        ProcedureCallCont(BudObject applicable, List<BudObject> arguments,
+                          Environment environment, Evaluator evaluator) {
+            this.applicable = applicable;
+            this.arguments = arguments;
+            this.environment = environment;
+            this.evaluator = evaluator;
+        }
+
+        @Override
+        public BudObject run() {
+            if (applicable == null) {
+                return evaluator.evaluate(operator, environment);
+            }
+
+            int index = arguments.size();
+            return evaluator.evaluate(operands.get(index), environment);
+        }
+
+        @Override
+        public Continuation handle(BudObject result) {
+            if (applicable == null) {
+                if (!BudType.Category.FUNCTION.equals(result.getType().getCategory())) {
+                    throw new EvaluatingException(result + " is not applicable");
+                }
+                return new ProcedureCallCont(result, new ArrayList<BudObject>(0), environment, evaluator);
+            }
+
+            List<BudObject> arguments = CollectionUtils.append(this.arguments, result);
+            if (arguments.size() >= operands.size()) {
+                return new ApplicationCont((Function) this.applicable, arguments);
+            } else {
+                return new ProcedureCallCont(applicable, arguments, environment, evaluator);
+            }
+        }
     }
 
     public static BudObject apply(BudObject applicable, List<BudObject> arguments) {

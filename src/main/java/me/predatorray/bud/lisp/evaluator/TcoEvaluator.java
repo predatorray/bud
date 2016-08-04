@@ -28,6 +28,7 @@ import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.parser.Expression;
 
+@Deprecated
 public class TcoEvaluator implements Evaluator {
 
     @Override

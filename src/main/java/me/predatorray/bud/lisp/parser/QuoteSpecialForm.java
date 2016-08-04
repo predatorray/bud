@@ -25,6 +25,8 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.*;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
+import me.predatorray.bud.lisp.lang.cont.Termination;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.parser.datum.*;
 import me.predatorray.bud.lisp.util.Validation;
@@ -51,6 +53,13 @@ public class QuoteSpecialForm extends TokenLocatedExpression {
         DatumObjectConstructor constructor = new DatumObjectConstructor();
         quotedDatum.accept(constructor);
         return new Terminal(constructor.datumObject);
+    }
+
+    @Override
+    public Continuation evalCont(Environment environment, Evaluator evaluator) {
+        DatumObjectConstructor constructor = new DatumObjectConstructor();
+        quotedDatum.accept(constructor);
+        return new Termination(constructor.datumObject);
     }
 
     public Datum getQuotedDatum() {

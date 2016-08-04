@@ -23,13 +23,15 @@
  */
 package me.predatorray.bud.lisp.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class Sets {
+public class CollectionUtils {
 
     @SafeVarargs
     public static <T> Set<T> asSet(T ...ts) {
@@ -46,5 +48,13 @@ public class Sets {
         union.addAll(collection1);
         union.addAll(collection2);
         return union;
+    }
+
+    public static <E> List<E> append(List<E> list, E last) {
+        Validation.notNull(list);
+        List<E> appended = new ArrayList<>(list.size() + 1);
+        appended.addAll(list);
+        appended.add(last);
+        return appended;
     }
 }

@@ -25,6 +25,9 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.*;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
+import me.predatorray.bud.lisp.lang.cont.EvalExpressionCont;
+import me.predatorray.bud.lisp.lang.cont.Termination;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
@@ -59,6 +62,48 @@ public class OrSpecialForm extends CompoundExpression {
         }
 
         return new TailExpression(tests.get(last), environment, evaluator);
+    }
+
+    @Override
+    public Continuation evalCont(Environment environment, Evaluator evaluator) {
+        return new OrCont(0, environment, evaluator);
+    }
+
+    private class OrCont implements Continuation {
+
+        private final int index;
+        private final Environment environment;
+        private final Evaluator evaluator;
+
+        OrCont(int index, Environment environment, Evaluator evaluator) {
+            this.index = index;
+            this.environment = environment;
+            this.evaluator = evaluator;
+        }
+
+        @Override
+        public BudObject run() {
+            if (index >= tests.size()) {
+                return BudBoolean.FALSE;
+            }
+            return evaluator.evaluate(tests.get(index), environment);
+        }
+
+        @Override
+        public Continuation handle(BudObject eachTested) {
+            if (index >= tests.size()) {
+                return null;
+            }
+            if (BudBoolean.isTrue(eachTested)) {
+                return null;
+            }
+            int next = index + 1;
+            if (next == tests.size() - 1) {
+                Expression nextTest = tests.get(next);
+                return new EvalExpressionCont(nextTest, environment, evaluator);
+            }
+            return new OrCont(next, environment, evaluator);
+        }
     }
 
     public List<Expression> getTests() {

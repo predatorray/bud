@@ -27,19 +27,20 @@ import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
 import me.predatorray.bud.lisp.lexer.IdentifierToken;
-import me.predatorray.bud.lisp.util.Sets;
+import me.predatorray.bud.lisp.util.CollectionUtils;
 import me.predatorray.bud.lisp.util.Validation;
 
 import java.util.Set;
 
 public class Keyword extends TokenLocatedExpression {
 
-    public static final Set<String> EXPRESSION_KEYWORDS = Sets.asSet(
+    public static final Set<String> EXPRESSION_KEYWORDS = CollectionUtils.asSet(
             "quote", "lambda", "if", "set!", "begin", "cond", "and", "or", "case",
             "let", "let*", "letrec", "do", "delay", "quasiquote");
 
-    public static final Set<String> SYNTACTIC_KEYWORDS = Sets.union(Sets.asSet(
+    public static final Set<String> SYNTACTIC_KEYWORDS = CollectionUtils.union(CollectionUtils.asSet(
             "else", "=>", "define", "unquote", "unquote-splicing"), EXPRESSION_KEYWORDS);
 
     public static Keyword getKeywordIfApplicable(IdentifierToken identifierToken) {
@@ -65,6 +66,11 @@ public class Keyword extends TokenLocatedExpression {
 
     @Override
     public Continuous evaluate(Environment environment, Evaluator evaluator) {
+        throw new EvaluatingException("cannot evaluate a keyword", this);
+    }
+
+    @Override
+    public Continuation evalCont(Environment environment, Evaluator evaluator) {
         throw new EvaluatingException("cannot evaluate a keyword", this);
     }
 

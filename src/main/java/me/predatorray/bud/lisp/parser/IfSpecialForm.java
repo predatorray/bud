@@ -25,6 +25,8 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.Evaluator;
 import me.predatorray.bud.lisp.lang.*;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
+import me.predatorray.bud.lisp.lang.cont.EvalExpressionCont;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
@@ -53,6 +55,36 @@ public class IfSpecialForm extends CompoundExpression {
             return new TailExpression(consequent, environment, evaluator);
         } else {
             return new TailExpression(alternate, environment, evaluator);
+        }
+    }
+
+    @Override
+    public Continuation evalCont(Environment environment, Evaluator evaluator) {
+        return new IfCont(environment, evaluator);
+    }
+
+    private class IfCont implements Continuation {
+
+        private final Environment environment;
+        private final Evaluator evaluator;
+
+        IfCont(Environment environment, Evaluator evaluator) {
+            this.environment = environment;
+            this.evaluator = evaluator;
+        }
+
+        @Override
+        public BudObject run() {
+            return evaluator.evaluate(test, environment);
+        }
+
+        @Override
+        public Continuation handle(BudObject tested) {
+            if (BudBoolean.isTrue(tested)) {
+                return new EvalExpressionCont(consequent, environment, evaluator);
+            } else {
+                return new EvalExpressionCont(alternate, environment, evaluator);
+            }
         }
     }
 

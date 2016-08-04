@@ -18,7 +18,7 @@ public class EvaluatorsTest extends AbstractBudLispTest {
 
     private final Environment EMPTY_ENV = new Environment();
 
-    private Evaluator sut = new TcoEvaluator();
+    private Evaluator sut = new ContinuationEvaluator();
 
     @Test
     public void testEvaluateString() throws Exception {
@@ -51,7 +51,7 @@ public class EvaluatorsTest extends AbstractBudLispTest {
     @Test
     public void testEvaluateFn1() throws Exception {
         String strVal = "same";
-        // (eq "same" "same") ==> true
+        // (eqv? "same" "same") ==> true
         Expression expr = newProcedureCall(newVariable("eqv?"), newStringLiteral(strVal), newStringLiteral(strVal));
 
         Environment initial = new Environment(Collections.<Variable, BudObject>singletonMap(
@@ -274,10 +274,10 @@ public class EvaluatorsTest extends AbstractBudLispTest {
     }
 
     private void verifyThatExpressionIsEvaluatedUnder(Expression expressionSpy, Environment environment) {
-        verify(expressionSpy).evaluate(same(environment), same(sut));
+        verify(expressionSpy).evalCont(same(environment), same(sut));
     }
 
     private void verifyThatExpressionIsNeverEvaluated(Expression expressionSpy) {
-        verify(expressionSpy, never()).evaluate(any(Environment.class), any(Evaluator.class));
+        verify(expressionSpy, never()).evalCont(any(Environment.class), any(Evaluator.class));
     }
 }

@@ -28,6 +28,8 @@ import me.predatorray.bud.lisp.lang.BudCharacter;
 import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Terminal;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
+import me.predatorray.bud.lisp.lang.cont.Termination;
 import me.predatorray.bud.lisp.lexer.CharacterToken;
 
 public class CharacterLiteral extends TokenLocatedExpression {
@@ -49,6 +51,11 @@ public class CharacterLiteral extends TokenLocatedExpression {
     @Override
     public Continuous evaluate(Environment environment, Evaluator evaluator) {
         return new Terminal(new BudCharacter(value));
+    }
+
+    @Override
+    public Continuation evalCont(Environment environment, Evaluator evaluator) {
+        return new Termination(new BudCharacter(value));
     }
 
     public char getValue() {

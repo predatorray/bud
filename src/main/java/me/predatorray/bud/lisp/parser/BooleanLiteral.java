@@ -28,6 +28,8 @@ import me.predatorray.bud.lisp.lang.BudBoolean;
 import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.Terminal;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
+import me.predatorray.bud.lisp.lang.cont.Termination;
 import me.predatorray.bud.lisp.lexer.BooleanToken;
 
 public class BooleanLiteral extends TokenLocatedExpression {
@@ -47,6 +49,11 @@ public class BooleanLiteral extends TokenLocatedExpression {
     @Override
     public Continuous evaluate(Environment environment, Evaluator evaluator) {
         return new Terminal(BudBoolean.valueOf(value));
+    }
+
+    @Override
+    public Continuation evalCont(Environment environment, Evaluator evaluator) {
+        return new Termination(BudBoolean.valueOf(value));
     }
 
     public boolean getValue() {

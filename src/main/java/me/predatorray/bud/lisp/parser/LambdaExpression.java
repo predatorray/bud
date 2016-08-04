@@ -28,6 +28,8 @@ import me.predatorray.bud.lisp.lang.Continuous;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lang.LambdaFunction;
 import me.predatorray.bud.lisp.lang.Terminal;
+import me.predatorray.bud.lisp.lang.cont.Continuation;
+import me.predatorray.bud.lisp.lang.cont.Termination;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.StringUtils;
 import me.predatorray.bud.lisp.util.Validation;
@@ -67,6 +69,11 @@ public class LambdaExpression extends TokenLocatedExpression {
     @Override
     public Continuous evaluate(Environment environment, Evaluator evaluator) {
         return new Terminal(new LambdaFunction(this, environment, self, evaluator));
+    }
+
+    @Override
+    public Continuation evalCont(Environment environment, Evaluator evaluator) {
+        return new Termination(new LambdaFunction(this, environment, self, evaluator));
     }
 
     @Override

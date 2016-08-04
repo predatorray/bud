@@ -23,7 +23,7 @@
  */
 package me.predatorray.bud.lisp.lexer;
 
-import me.predatorray.bud.lisp.util.Sets;
+import me.predatorray.bud.lisp.util.CollectionUtils;
 import me.predatorray.bud.lisp.util.StringEscapeUtils;
 
 import java.math.BigDecimal;
@@ -296,13 +296,13 @@ class LexerIterator implements Iterator<Token> {
         return charOrCharName;
     }
 
-    private static final Set<Character> WHITESPACES = Sets.asSet(' ', '\n', '\t', '\r');
+    private static final Set<Character> WHITESPACES = CollectionUtils.asSet(' ', '\n', '\t', '\r');
 
     private boolean isWhiteSpace(char c) {
         return WHITESPACES.contains(c);
     }
 
-    private static final Set<Character> DELIMITERS = Sets.union(WHITESPACES, Sets.asSet('(', ')', '"', ';'));
+    private static final Set<Character> DELIMITERS = CollectionUtils.union(WHITESPACES, CollectionUtils.asSet('(', ')', '"', ';'));
 
     private boolean isEndOfSymbolOrNumberOrChar() {
         int nextIndex = currIndex + 1;
@@ -316,7 +316,7 @@ class LexerIterator implements Iterator<Token> {
         }
     }
 
-    private static final Set<Character> PREFIXES_OF_NUMBER = Sets.union(NUMBERS, Sets.asSet('.'));
+    private static final Set<Character> PREFIXES_OF_NUMBER = CollectionUtils.union(NUMBERS, CollectionUtils.asSet('.'));
 
     private static final Map<String, Character> CHAR_NAME_MAP = new HashMap<>();
     static {
