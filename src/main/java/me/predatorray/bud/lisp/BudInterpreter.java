@@ -24,8 +24,8 @@
 package me.predatorray.bud.lisp;
 
 import me.predatorray.bud.lisp.builtin.BuiltinsEnvironment;
+import me.predatorray.bud.lisp.evaluator.ContinuationEvaluator;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.evaluator.TcoEvaluator;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lexer.Lexer;
@@ -46,7 +46,7 @@ public class BudInterpreter {
     private final Environment initial;
 
     public BudInterpreter() {
-        this(new TcoEvaluator());
+        this(new ContinuationEvaluator());
     }
 
     public BudInterpreter(Evaluator evaluator) {

@@ -24,9 +24,9 @@
 package me.predatorray.bud.lisp;
 
 import me.predatorray.bud.lisp.builtin.BuiltinsEnvironment;
+import me.predatorray.bud.lisp.evaluator.ContinuationEvaluator;
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.evaluator.TcoEvaluator;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lexer.Lexer;
@@ -36,7 +36,14 @@ import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.Parser;
 import me.predatorray.bud.lisp.parser.ParserException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -53,7 +60,7 @@ public class BudRepl {
     }
 
     public BudRepl(boolean interactive) {
-        this.evaluator = new TcoEvaluator();
+        this.evaluator = new ContinuationEvaluator();
         this.initial = BuiltinsEnvironment.INSTANCE;
         this.interactive = interactive;
     }

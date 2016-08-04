@@ -1,7 +1,7 @@
 package me.predatorray.bud.lisp.builtin;
 
+import me.predatorray.bud.lisp.evaluator.ContinuationEvaluator;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.evaluator.TcoEvaluator;
 import me.predatorray.bud.lisp.lang.BudBoolean;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 public class BuiltinsEnvironmentTest extends AbstractBudLispTest {
 
     private final Environment initial = BuiltinsEnvironment.INSTANCE;
-    private final Evaluator evaluator = new TcoEvaluator();
+    private final Evaluator evaluator = new ContinuationEvaluator();
 
     private void assertEvaluatesCorrectly(String message, BudObject expected, Expression input) {
         BudObject actual = evaluator.evaluate(input, initial);
