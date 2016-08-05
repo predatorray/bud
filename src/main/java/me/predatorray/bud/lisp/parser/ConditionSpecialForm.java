@@ -25,7 +25,14 @@ package me.predatorray.bud.lisp.parser;
 
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.lang.*;
+import me.predatorray.bud.lisp.lang.BudBoolean;
+import me.predatorray.bud.lisp.lang.BudObject;
+import me.predatorray.bud.lisp.lang.BudType;
+import me.predatorray.bud.lisp.lang.Continuous;
+import me.predatorray.bud.lisp.lang.Environment;
+import me.predatorray.bud.lisp.lang.TailApplication;
+import me.predatorray.bud.lisp.lang.TailExpression;
+import me.predatorray.bud.lisp.lang.Terminal;
 import me.predatorray.bud.lisp.lexer.LeftParenthesis;
 import me.predatorray.bud.lisp.util.Validation;
 
@@ -57,15 +64,15 @@ public class ConditionSpecialForm extends CompoundExpression {
                 continue;
             }
 
-            if (clause.hasRecipient()) {
+            if (clause.isTestAlone()) {
+                return new Terminal(tested);
+            } else if (clause.hasRecipient()) {
                 Expression recipient = clause.getRecipient();
                 BudObject recipientObj = evaluator.evaluate(recipient, environment);
                 if (!BudType.Category.FUNCTION.equals(recipientObj.getType().getCategory())) {
                     throw new NotApplicableException(recipient);
                 }
-                Function recipientFunction = (Function) recipientObj;
-                recipientFunction.inspect(Collections.singletonList(tested.getType()));
-                return new TailApplication(recipientFunction, Collections.singletonList(tested));
+                return new TailApplication(recipientObj, Collections.singletonList(tested));
             } else {
                 Expression consequent = clause.getConsequent();
                 return new TailExpression(consequent, environment, evaluator);

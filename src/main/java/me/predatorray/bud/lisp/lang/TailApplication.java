@@ -23,8 +23,10 @@
  */
 package me.predatorray.bud.lisp.lang;
 
+import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.util.Validation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class TailApplication implements Continuous {
@@ -32,8 +34,12 @@ public final class TailApplication implements Continuous {
     private final Function function;
     private final List<BudObject> arguments;
 
-    public TailApplication(Function function, List<BudObject> arguments) {
-        this.function = Validation.notNull(function);
+    public TailApplication(BudObject applicable, List<BudObject> arguments) {
+        Validation.notNull(applicable);
+        if (!BudType.Category.FUNCTION.equals(applicable.getType().getCategory())) {
+            throw new EvaluatingException(applicable + " is not applicable");
+        }
+        this.function = (Function) applicable;
         this.arguments = Validation.notNull(arguments);
     }
 
@@ -44,6 +50,12 @@ public final class TailApplication implements Continuous {
 
     @Override
     public Continuous getSuccessor() {
+        List<BudType> argTypes = new ArrayList<>(arguments.size());
+        for (BudObject argument : arguments) {
+            argTypes.add(argument.getType());
+        }
+        function.inspect(argTypes);
+
         if (function instanceof TailCallFunction) {
             TailCallFunction tailCallFunction = (TailCallFunction) this.function;
             return tailCallFunction.applyAndGetBudFuture(arguments);

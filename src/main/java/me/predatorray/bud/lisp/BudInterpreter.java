@@ -78,12 +78,10 @@ public class BudInterpreter {
         Lexer lexer = new Lexer(source);
         Parser parser = new Parser();
         List<Expression> expressions = parser.parse(lexer);
-        if (expressions.size() == 1) {
-            Expression expression = expressions.get(0);
-            return evaluator.evaluate(expression, initial);
-        } else {
-            // TODO same as begin expression
-            throw new UnsupportedOperationException();
+        BudObject result = null;
+        for (Expression expression : expressions) {
+            result = evaluator.evaluate(expression, initial);
         }
+        return result;
     }
 }
