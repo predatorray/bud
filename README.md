@@ -32,13 +32,9 @@ A list of data types that are currently supported are shown below.
 
 ### Running REPL
 
-Use Maven to build the jar.
+Use the Maven wrapper to compile and execute,
 
-    mvn clean package
-
-Run it as a Java program.
-
-    java -cp target target/bud-1.0-SNAPSHOT.jar me.predatorray.bud.lisp.BudRepl
+    ./mvnw clean compile exec:java -Dexec.mainClass='me.predatorray.bud.lisp.BudRepl'
 
 Finally, type your Lisp expressions.
 
