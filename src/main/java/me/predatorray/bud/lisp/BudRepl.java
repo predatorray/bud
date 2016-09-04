@@ -1,9 +1,32 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016 Wenhao Ji
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package me.predatorray.bud.lisp;
 
-import me.predatorray.bud.lisp.buitin.BuiltinsEnvironment;
+import me.predatorray.bud.lisp.builtin.BuiltinsEnvironment;
 import me.predatorray.bud.lisp.evaluator.EvaluatingException;
 import me.predatorray.bud.lisp.evaluator.Evaluator;
-import me.predatorray.bud.lisp.evaluator.NaiveEvaluator;
+import me.predatorray.bud.lisp.evaluator.TcoEvaluator;
 import me.predatorray.bud.lisp.lang.BudObject;
 import me.predatorray.bud.lisp.lang.Environment;
 import me.predatorray.bud.lisp.lexer.Lexer;
@@ -13,14 +36,7 @@ import me.predatorray.bud.lisp.parser.Expression;
 import me.predatorray.bud.lisp.parser.Parser;
 import me.predatorray.bud.lisp.parser.ParserException;
 
-import java.io.BufferedReader;
-import java.io.Console;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -37,7 +53,7 @@ public class BudRepl {
     }
 
     public BudRepl(boolean interactive) {
-        this.evaluator = new NaiveEvaluator();
+        this.evaluator = new TcoEvaluator();
         this.initial = BuiltinsEnvironment.INSTANCE;
         this.interactive = interactive;
     }
