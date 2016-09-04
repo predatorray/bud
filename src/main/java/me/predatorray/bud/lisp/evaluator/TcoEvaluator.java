@@ -41,4 +41,18 @@ public class TcoEvaluator implements Evaluator {
             nextCall = successor;
         }
     }
+
+    @Override
+    public BudObject evaluateInterruptibly(Expression expression, Environment environment)
+            throws InterruptedException {
+        Continuous nextCall = expression.evaluate(environment, this);
+        while (!Thread.currentThread().isInterrupted()) {
+            Continuous successor = nextCall.getSuccessor();
+            if (successor == null) {
+                return nextCall.getResult();
+            }
+            nextCall = successor;
+        }
+        throw new InterruptedException();
+    }
 }

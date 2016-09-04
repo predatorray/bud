@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class EvaluatorsTest extends AbstractBudLispTest {
@@ -271,6 +272,39 @@ public class EvaluatorsTest extends AbstractBudLispTest {
         BudObject evaluated = sut.evaluate(condSpecialForm, BuiltinsEnvironment.INSTANCE);
 
         assertEquals("(cond (1 => -)) ==> -1", new BudNumber(new BigDecimal(-1)), evaluated);
+    }
+
+    @Test(timeout = 5000)
+    public void testInterrupt() throws Exception {
+        //  ((lambda ()
+        //      (define (infinite_loop)
+        //          (infinite_loop))
+        //      (infinite_loop)))
+        String infiniteLoop = "infinite_loop";
+        Variable infLoopVar = newVariable(infiniteLoop);
+        ProcedureCall infiniteLoopCall = newProcedureCall(infLoopVar);
+        Definition definition = new Definition(infLoopVar, Collections.<Variable>emptyList(),
+                infiniteLoopCall);
+        LambdaExpression lambda = new LambdaExpression(Collections.<Variable>emptyList(), Collections.singletonList(definition),
+                infiniteLoopCall, LP);
+        final ProcedureCall lambdaCall = newProcedureCall(lambda);
+
+        final InterruptedException[] exHolder = new InterruptedException[1];
+        Thread evalThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    sut.evaluateInterruptibly(lambdaCall, BuiltinsEnvironment.INSTANCE);
+                } catch (InterruptedException e) {
+                    exHolder[0] = e;
+                }
+            }
+        });
+        evalThread.start();
+        evalThread.interrupt();
+        evalThread.join();
+
+        assertNotNull(exHolder[0]);
     }
 
     private void verifyThatExpressionIsEvaluatedUnder(Expression expressionSpy, Environment environment) {

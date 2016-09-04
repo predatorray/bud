@@ -30,4 +30,6 @@ import me.predatorray.bud.lisp.parser.Expression;
 public interface Evaluator {
 
     BudObject evaluate(Expression expression, Environment environment);
+
+    BudObject evaluateInterruptibly(Expression expression, Environment environment) throws InterruptedException;
 }

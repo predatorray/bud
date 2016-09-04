@@ -58,7 +58,45 @@ public class BudInterpreter {
         this.initial = Validation.notNull(initial);
     }
 
-    public BudObject execute(Path sourceFilePath) throws IOException {
+    public BudObject interpret(Path sourceFilePath) throws IOException {
+        CharSequence sourceSequence = readSourceFromPath(sourceFilePath);
+        return interpret(sourceSequence);
+    }
+
+    public BudObject interpretInterruptibly(Path sourceFilePath) throws IOException, InterruptedException {
+        CharSequence sourceSequence = readSourceFromPath(sourceFilePath);
+        return interpretInterruptibly(sourceSequence);
+    }
+
+    public BudObject interpret(CharSequence source) {
+        List<Expression> expressions = parseSource(source);
+        if (expressions.size() == 1) {
+            Expression expression = expressions.get(0);
+            return evaluator.evaluate(expression, initial);
+        } else {
+            // TODO same as begin expression
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public BudObject interpretInterruptibly(CharSequence source) throws InterruptedException {
+        List<Expression> expressions = parseSource(source);
+        if (expressions.size() == 1) {
+            Expression expression = expressions.get(0);
+            return evaluator.evaluateInterruptibly(expression, initial);
+        } else {
+            // TODO same as begin expression
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private List<Expression> parseSource(CharSequence source) {
+        Lexer lexer = new Lexer(source);
+        Parser parser = new Parser();
+        return parser.parse(lexer);
+    }
+
+    private CharSequence readSourceFromPath(Path sourceFilePath) throws IOException {
         Validation.notNull(sourceFilePath);
         StringBuilder sourceSequence = new StringBuilder();
         char[] buffer = new char[2048];
@@ -71,19 +109,6 @@ public class BudInterpreter {
                 sourceSequence.append(buffer, 0, read);
             }
         }
-        return execute(sourceSequence);
-    }
-
-    public BudObject execute(CharSequence source) {
-        Lexer lexer = new Lexer(source);
-        Parser parser = new Parser();
-        List<Expression> expressions = parser.parse(lexer);
-        if (expressions.size() == 1) {
-            Expression expression = expressions.get(0);
-            return evaluator.evaluate(expression, initial);
-        } else {
-            // TODO same as begin expression
-            throw new UnsupportedOperationException();
-        }
+        return sourceSequence;
     }
 }

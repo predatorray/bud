@@ -22,9 +22,15 @@ public abstract class AbstractInterpreterTest extends AbstractBudLispTest {
     }
 
     protected final void assertInterpretCorrectly(BudObject expected, String sourceClasspath)
-            throws URISyntaxException, IOException {
+            throws URISyntaxException, IOException, InterruptedException {
         Path path = Paths.get(this.getClass().getResource(sourceClasspath).toURI());
-        BudObject actual = interpreter.execute(path);
-        Assert.assertEquals(expected, actual);
+        {
+            BudObject actual = interpreter.interpret(path);
+            Assert.assertEquals(expected, actual);
+        }
+        {
+            BudObject actual = interpreter.interpretInterruptibly(path);
+            Assert.assertEquals(expected, actual);
+        }
     }
 }
