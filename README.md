@@ -36,9 +36,11 @@ Use the Maven wrapper to compile and execute,
 
     ./mvnw clean compile exec:java -Dexec.mainClass='me.predatorray.bud.lisp.BudRepl'
 
-Or, if the docker cli is avaiable on your computer, you can just run the lastest `zetaplusae/bud` image published on Docker Hub,
+If the docker cli is available on your computer, you can just run the lastest `zetaplusae/bud` image published on Docker Hub,
 
     docker run -it --rm zetaplusae/bud:latest
+
+Or, you can try [the REPL online](http://bud.predatorray.me/).
 
 Finally, type your Lisp expressions.
 
