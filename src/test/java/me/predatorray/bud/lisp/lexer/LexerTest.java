@@ -21,7 +21,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testLexer1() {
+    public void testNormalApplication() {
         assertMatches(Arrays.asList(
                 new LeftParenthesis(new TextLocation(1, 1)),
                 new IdentifierToken("+", new TextLocation(1, 2)),
@@ -34,7 +34,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testLexer2() {
+    public void testApplyingEscapedString() {
         assertMatches(Arrays.asList(
                 new LeftParenthesis(new TextLocation(1, 1)),
                 new IdentifierToken("foobar", new TextLocation(1, 2)),
@@ -45,7 +45,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testLexer3() {
+    public void testMultipleIdentifiers() {
         assertMatches(Arrays.asList(
                 new Atmosphere(new TextLocation(1, 1)),
                 new NumberToken(new BigDecimal(123), new TextLocation(2, 1)),
@@ -59,7 +59,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testLexer4() {
+    public void testBoolean() {
         assertMatches(Arrays.asList(new BooleanToken(true, new TextLocation(1, 1)),
                 new Atmosphere(new TextLocation(1, 3)),
                 new BooleanToken(false, new TextLocation(1, 4))),
@@ -67,8 +67,20 @@ public class LexerTest {
     }
 
     @Test
-    public void testLexer5() {
+    public void testCharacter() {
         assertMatches(Collections.singletonList(new CharacterToken((char) 1, new TextLocation(1, 1))),
                 "#\\001");
+    }
+
+    @Test
+    public void testNumber() {
+        assertMatches(Collections.singletonList(new NumberToken(new BigDecimal("0.123"), new TextLocation(1, 1))),
+                ".123");
+    }
+
+    @Test
+    public void testIdentifierContainingNumber() {
+        assertMatches(Collections.singletonList(new IdentifierToken("fib0", new TextLocation(1, 1))),
+                "fib0");
     }
 }

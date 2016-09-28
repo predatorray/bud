@@ -197,7 +197,7 @@ class LexerIterator implements Iterator<Token> {
                         if (isWhiteSpace(currChar)) {
                             return new Atmosphere(getCurrentCharLocation());
                         }
-                        if (PREFIXES_OF_NUMBER.contains(currChar)) {
+                        if (symbolValue.length() == 0 && PREFIXES_OF_NUMBER.contains(currChar)) {
                             numberValue.append(currChar);
                             state = TokenizerState.WITHIN_NUMBER;
                             numberLocation = location.clone();

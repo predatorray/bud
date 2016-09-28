@@ -72,4 +72,9 @@ public class BudInterpreterTest extends AbstractInterpreterTest {
                 new BudNumber(new BigDecimal(4)),
                 new BudNumber(new BigDecimal(6)))), "double-number-list.bud");
     }
+
+    @Test
+    public void testFibonacci() throws Exception {
+        assertInterpretCorrectly(new BudNumber(new BigDecimal("573147844013817084101")), "fibonacci.bud");
+    }
 }

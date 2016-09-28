@@ -1,0 +1,7 @@
+((lambda (x)
+    (define (fibonacci x a b)
+        (if (> x 0)
+            (fibonacci (- x 1) b (+ a b))
+            b))
+    (fibonacci x 0 1)
+) 100)
