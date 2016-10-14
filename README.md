@@ -1,5 +1,7 @@
 # Bud
 
+[![Join the chat at https://gitter.im/bud-lisp/Lobby](https://badges.gitter.im/bud-lisp/Lobby.svg)](https://gitter.im/bud-lisp/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/predatorray/bud.svg?branch=master)](https://travis-ci.org/predatorray/bud)
 [![Coverage Status](https://coveralls.io/repos/github/predatorray/bud/badge.svg?branch=master)](https://coveralls.io/github/predatorray/bud?branch=master)
 
