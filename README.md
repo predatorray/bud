@@ -1,5 +1,7 @@
 # Bud
 
+[![Join the chat at https://gitter.im/bud-lisp/Lobby](https://badges.gitter.im/bud-lisp/Lobby.svg)](https://gitter.im/bud-lisp/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/predatorray/bud.svg?branch=master)](https://travis-ci.org/predatorray/bud)
 [![Coverage Status](https://coveralls.io/repos/github/predatorray/bud/badge.svg?branch=master)](https://coveralls.io/github/predatorray/bud?branch=master)
 
@@ -35,6 +37,12 @@ A list of data types that are currently supported are shown below.
 Use the Maven wrapper to compile and execute,
 
     ./mvnw clean compile exec:java -Dexec.mainClass='me.predatorray.bud.lisp.BudRepl'
+
+If the docker cli is available on your computer, you can just run the lastest `zetaplusae/bud` image published on Docker Hub,
+
+    docker run -it --rm zetaplusae/bud:latest
+
+Or, you can try [the REPL online](http://bud.predatorray.me/).
 
 Finally, type your Lisp expressions.
 
