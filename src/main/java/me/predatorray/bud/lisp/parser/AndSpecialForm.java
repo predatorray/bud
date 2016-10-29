@@ -79,9 +79,4 @@ public class AndSpecialForm extends CompoundExpression {
     public int hashCode() {
         return tests.hashCode();
     }
-
-    @Override
-    public String toString() {
-        return "";
-    }
 }
