@@ -42,7 +42,7 @@ If the docker cli is available on your computer, you can just run the lastest `z
 
     docker run -it --rm zetaplusae/bud:latest
 
-Or, you can try [the REPL online](http://bud.cloud.predatorray.me/).
+Or, you can try [the REPL online](https://bud.arukascloud.io/).
 
 Finally, type your Lisp expressions.
 
